@@ -255,6 +255,25 @@
       pad="false"
       name="NATIONAL DATA"
       class="org.jpos.iso.IFA_LLLBINARY"/>
+  
+   <isofield
+      id="60"
+      length="255"
+      pad="false"
+      name="NATIONAL DATA"
+      class="org.jpos.iso.IFA_LLLBINARY"/>
+    <isofield
+      id="62"
+      length="255"
+      pad="false"
+      name="NATIONAL DATA"
+      class="org.jpos.iso.IFA_LLLBINARY"/>
+     <isofield
+      id="63"
+      length="255"
+      pad="false"
+      name="NATIONAL DATA"
+      class="org.jpos.iso.IFA_LLLBINARY"/>
   <isofield
       id="64"
       length="8"

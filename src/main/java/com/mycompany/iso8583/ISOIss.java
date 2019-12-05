@@ -7,7 +7,9 @@ package com.mycompany.iso8583;
 
 import org.jpos.iso.IFA_BITMAP;
 import org.jpos.iso.IFA_FLLCHAR;
+import org.jpos.iso.IFA_LLBINARY;
 import org.jpos.iso.IFA_LLCHAR;
+import org.jpos.iso.IFA_LLLBINARY;
 import org.jpos.iso.IFA_LLLCHAR;
 import org.jpos.iso.IFA_LLLLCHAR;
 import org.jpos.iso.IFA_LLNUM;
@@ -16,9 +18,11 @@ import org.jpos.iso.IFB_AMOUNT;
 import org.jpos.iso.IFB_BINARY;
 import org.jpos.iso.IFB_BITMAP;
 import org.jpos.iso.IFB_HEX;
+import org.jpos.iso.IFB_LLBINARY;
 import org.jpos.iso.IFB_LLCHAR;
 import org.jpos.iso.IFB_LLHBINARY;
 import org.jpos.iso.IFB_LLHEX;
+import org.jpos.iso.IFB_LLLBINARY;
 import org.jpos.iso.IFB_LLLCHAR;
 import org.jpos.iso.IFB_LLLLCHAR;
 import org.jpos.iso.IFB_LLLNUM;
@@ -31,6 +35,7 @@ import org.jpos.iso.IFE_LLLBINARY;
 import org.jpos.iso.IFE_LLLCHAR;
 import org.jpos.iso.IFE_LLLLCHAR;
 import org.jpos.iso.IFE_LLLNUM;
+import org.jpos.iso.IFE_LLNUM;
 import org.jpos.iso.IFE_NUMERIC;
 import org.jpos.iso.IF_CHAR;
 import org.jpos.iso.IF_ECHAR;
@@ -104,10 +109,10 @@ public class ISOIss  extends ISOBasePackager{
             new IFE_CHAR (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED NATIONAL"),
   /*59*/    new IFE_CHAR (255, "RESERVED NATIONAL"),
-  /*add 60*/new IFB_HEX (12, "NATIONAL POINT-OF-SERVICE GEOGRAPHIC DATA",pad),
+  /*add 60*/new IFB_LLBINARY (12, "NATIONAL POINT-OF-SERVICE GEOGRAPHIC DATA"),
    /*add61*/new IFB_LLNUM (36, "ADDITIONAL POS INFORMATION",true),
-            new IFB_LLLNUM (255, "RESERVED NATIONAL",true),
-     /*63*/ new IFB_LLLNUM (256, "RESERVED PRIVATE",true),
+            new IFB_LLBINARY (36, "RESERVED NATIONAL"),
+     /*63*/ new IFB_LLBINARY (36, "RESERVED PRIVATE"),
     
             
 

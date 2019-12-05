@@ -5,6 +5,8 @@
  */
 package com.mycompany.iso8583;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +30,7 @@ public class parse {
            ISOMsg msg = new ISOMsg();
            GenericPackager packager = new GenericPackager("/home/azelinsky/ISS/parseISO/src/resources/grab.xml");
            
-          // msg.setPackager(packager);
+           //msg.setPackager(packager);
            msg.setPackager(new ISOIss());
           // msg.unpack(packmessSmoll());
             msg.unpack(packmess());
@@ -58,9 +60,19 @@ public static byte[] packmess() {
        byte[] data = null;
        
        //String message=ISOUtil.hexString(packmessSmoll());
-       data=message1.getBytes();
+       byte[] packed=packmessSmoll();
+       String string=ISOUtil.hexString(packed);
+   
+        byte[] c=ISOUtil.hex2byte(string);
         
-  return  data;
+        //System.err.println(ISOUtil.e));
+      
+        byte[] b =string.getBytes(StandardCharsets.UTF_8);
+      
+
+       System.out.println("*2 " +c.length);
+        
+  return  c;
       
       }
 public static byte[] packmessSmoll() {
@@ -112,6 +124,7 @@ public static byte[] packmessSmoll() {
     } catch (ISOException ex) {
         Logger.getLogger(parse.class.getName()).log(Level.SEVERE, null, ex);
     }
+    System.out.println("*1 "+data.length);
         return  data;
   
       
