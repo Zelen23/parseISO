@@ -49,4 +49,18 @@
  length="12"
  name="Amount, Cardholder billing"
  class="org.jpos.iso.IF_ECHAR"/>
+   
+   <isofieldpackager id="35"
+                      name="TRACK 2 DATA"
+                      length="37"
+                      class="org.jpos.iso.IFE_LLNUM"
+                      emitBitmap="false"
+                      pad="true"
+                      packager="org.jpos.iso.packager.GenericSubFieldPackager">
+        <isofield id="1" length="19" name="PAN" class="org.jpos.iso.IF_CHAR"/>
+        <isofield id="2" length="1" name="Separator" class="org.jpos.iso.IF_CHAR"/>
+        <isofield id="3" length="4" name="Expiration Data" class="org.jpos.iso.IF_CHAR"/>
+        <isofield id="4" length="3" name="Extended Service Code" class="org.jpos.iso.IF_CHAR"/>
+        <isofield id="5" length="10" name="Discretionary Data" class="org.jpos.iso.IF_CHAR"/>
+    </isofieldpackager>
 </isopackager>
