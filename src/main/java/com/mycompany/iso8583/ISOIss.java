@@ -5,58 +5,29 @@
  */
 package com.mycompany.iso8583;
 
-import org.jpos.iso.IFAE_LLCHAR;
-import org.jpos.iso.IFA_BINARY;
-import org.jpos.iso.IFA_BITMAP;
-import org.jpos.iso.IFA_FLLCHAR;
-import org.jpos.iso.IFA_FLLNUM;
-import org.jpos.iso.IFA_LLABINARY;
-import org.jpos.iso.IFA_LLBINARY;
-import org.jpos.iso.IFA_LLCHAR;
-import org.jpos.iso.IFA_LLLBINARY;
-import org.jpos.iso.IFA_LLLCHAR;
-import org.jpos.iso.IFA_LLLLCHAR;
-import org.jpos.iso.IFA_LLNUM;
-import org.jpos.iso.IFA_NUMERIC;
+
 import org.jpos.iso.IFB_AMOUNT;
 import org.jpos.iso.IFB_BINARY;
 import org.jpos.iso.IFB_BITMAP;
-import org.jpos.iso.IFB_FLLNUM;
+
 import org.jpos.iso.IFB_HEX;
-import org.jpos.iso.IFB_LLBINARY;
+
 import org.jpos.iso.IFB_LLCHAR;
 import org.jpos.iso.IFB_LLHBINARY;
-import org.jpos.iso.IFB_LLHCHAR;
+
 import org.jpos.iso.IFB_LLHECHAR;
-import org.jpos.iso.IFB_LLHEX;
-import org.jpos.iso.IFB_LLHFBINARY;
+
 import org.jpos.iso.IFB_LLHNUM;
-import org.jpos.iso.IFB_LLLBINARY;
+
 import org.jpos.iso.IFB_LLLCHAR;
-import org.jpos.iso.IFB_LLLHBINARY;
-import org.jpos.iso.IFB_LLLHECHAR;
-import org.jpos.iso.IFB_LLLHNUM;
-import org.jpos.iso.IFB_LLLLCHAR;
-import org.jpos.iso.IFB_LLLNUM;
+
 import org.jpos.iso.IFB_LLNUM;
 import org.jpos.iso.IFB_NUMERIC;
-import org.jpos.iso.IFEA_LLCHAR;
-import org.jpos.iso.IFEP_LLLBINARY;
-import org.jpos.iso.IFE_BINARY;
-import org.jpos.iso.IFE_BITMAP;
+
 import org.jpos.iso.IFE_CHAR;
-import org.jpos.iso.IFE_CHAR;
-import org.jpos.iso.IFE_LLBINARY;
-import org.jpos.iso.IFE_LLLBINARY;
-import org.jpos.iso.IFE_LLLCHAR;
-import org.jpos.iso.IFE_LLLEBINARY;
-import org.jpos.iso.IFE_LLLLCHAR;
-import org.jpos.iso.IFE_LLLNUM;
-import org.jpos.iso.IFE_LLNUM;
-import org.jpos.iso.IFE_NUMERIC;
+
 import org.jpos.iso.IF_CHAR;
-import org.jpos.iso.IF_ECHAR;
-import org.jpos.iso.IF_TBASE;
+
 import org.jpos.iso.ISOBasePackager;
 import org.jpos.iso.ISOFieldPackager;
 

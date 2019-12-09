@@ -5,18 +5,16 @@
  */
 package com.mycompany.iso8583;
 
-import java.nio.charset.Charset;
+
 import java.nio.charset.StandardCharsets;
-import java.util.BitSet;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jpos.iso.ISOException;
-//import org.jpos.iso.ISOException;
-//import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
 import org.jpos.iso.packager.GenericPackager;
-import org.jpos.iso.packager.ISO87BPackager;
+
 
 /**
  *
@@ -25,22 +23,22 @@ import org.jpos.iso.packager.ISO87BPackager;
 public class parse {
     
    public static void main(String[] args) {
-       //String message =args[0].toString();
+       String message =args[0].toString();
            //System.err.println("mess");
            
        try {
            
            
-            //byte[] c=ISOUtil.hex2byte(message);
+            byte[] c=ISOUtil.hex2byte(message);
            
            // Create ISO Message
            ISOMsg msg = new ISOMsg();
-           GenericPackager packager = new GenericPackager("src/resources/grab.xml");
+           //GenericPackager packager = new GenericPackager("src/resources/grab.xml");
            
            //msg.setPackager(packager);
            msg.setPackager(new ISOIss());
           // msg.unpack(packmessSmoll());
-            msg.unpack(packmess());
+            msg.unpack(c);
           
            String cat = msg.getMTI();
            for (int i=1;i<=msg.getMaxField();i++) {
@@ -103,7 +101,7 @@ public static byte[] packmessSmoll() {
            byte[] data = null;
     try {
         
-        GenericPackager packager = new GenericPackager("src/resources/grab.xml");
+       // GenericPackager packager = new GenericPackager("src/resources/grab.xml");
         
         ISOMsg isoMsg = new ISOMsg();
         //isoMsg.setPackager(packager);
