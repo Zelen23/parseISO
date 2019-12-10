@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +26,8 @@ import org.jpos.iso.*;
 public class parse {
 
     static Integer de011=100001;
-    
+
+    /*
 public static void main(String[] args) {
 
     //String message =args[0].toString();
@@ -39,11 +40,15 @@ public static void main(String[] args) {
 
     }
 
-public static ISOMsg parse(String message){
+    *
+     */
+
+public  ISOMsg parsers(String  message){
     ISOMsg msg = new ISOMsg();
+    System.out.println(" --- "+message );
+
 
     try {
-
 
         byte[] c=ISOUtil.hex2byte(message);
 
@@ -183,7 +188,7 @@ public static byte[] createEcho(){
               // Get and print the output result
              data = msg.pack();
               String message = ISOUtil.hexString(data);
-             // System.out.println("RESULT_0800 : " +message);
+                       System.out.println("RESULT_0800 : " +message);
 
 
           } catch (ISOException e) {
@@ -215,10 +220,10 @@ public static byte[] createEcho810(ISOMsg isoMsg){
         return data;
     }
 
-public static void checkREsp(String resp){
+public void checkREsp(String resp){
 
     String mes=resp.substring(52);
-    parse(mes);
+    //parsers(mes);
 
 
 }
@@ -230,18 +235,17 @@ static void server(){
         byte[] inmess=new byte[66];
         String dataString="";
 
-
-
                 try {
                     ServerSocket server=new ServerSocket(3111);
                     Socket conn=server.accept();
                     out=new DataOutputStream(new DataOutputStream(conn.getOutputStream()));
-                    String send=header_echo+ISOUtil.hexString(createEcho());
-                    System.out.println(send);
-                    byte[] c=ISOUtil.hex2byte(send);
+
 
                     while (true){
                         try {
+                            String send=header_echo+ISOUtil.hexString(createEcho());
+                            System.out.println(send);
+                            byte[] c=ISOUtil.hex2byte(send);
                             Thread.sleep(5000);
                             out.write(c);
 
@@ -261,6 +265,37 @@ static void server(){
 
     }
 
+
+
+public HashMap<String, Object> parseToArray(String rawMessage){
+
+
+    HashMap<String, Object> list=new LinkedHashMap<String, Object>();
+
+    ISOMsg msg = new ISOMsg();
+
+    try {
+
+        byte[] c=ISOUtil.hex2byte(rawMessage);
+        msg.setPackager(new ISOIss());
+        msg.unpack(c);
+
+        String cat = msg.getMTI();
+        list.put("mti",cat);
+        for (int i=1;i<=msg.getMaxField();i++) {
+            if (msg.hasField(i)) {
+                list.put("de-"+i,msg.getString(i));
+            }
+
+        }
+
+    } catch (ISOException ex) {
+        Logger.getLogger(parse.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+
+return list;
+};
 
 
 
