@@ -26,7 +26,8 @@ import org.jpos.iso.*;
 public class parse {
 
     static Integer de011=100001;
-    
+
+    /*
 public static void main(String[] args) {
 
     //String message =args[0].toString();
@@ -38,6 +39,9 @@ public static void main(String[] args) {
 
 
     }
+
+    *
+     */
 
 public static ISOMsg parse(String message){
     ISOMsg msg = new ISOMsg();
@@ -230,18 +234,17 @@ static void server(){
         byte[] inmess=new byte[66];
         String dataString="";
 
-
-
                 try {
                     ServerSocket server=new ServerSocket(3111);
                     Socket conn=server.accept();
                     out=new DataOutputStream(new DataOutputStream(conn.getOutputStream()));
-                    String send=header_echo+ISOUtil.hexString(createEcho());
-                    System.out.println(send);
-                    byte[] c=ISOUtil.hex2byte(send);
+
 
                     while (true){
                         try {
+                            String send=header_echo+ISOUtil.hexString(createEcho());
+                            System.out.println(send);
+                            byte[] c=ISOUtil.hex2byte(send);
                             Thread.sleep(5000);
                             out.write(c);
 
