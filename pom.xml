@@ -37,7 +37,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.mycompany.iso8583.parse</mainClass>
+                            <mainClass>rest.Application</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -64,7 +64,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>com.mycompany.iso8583.parse</mainClass>
+                            <mainClass>rest.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

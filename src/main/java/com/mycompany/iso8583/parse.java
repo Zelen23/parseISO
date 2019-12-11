@@ -228,7 +228,7 @@ public void checkREsp(String resp){
 
 }
 
-static void server(){
+public static void server(){
         DataInputStream in;
         DataOutputStream out;
         String header_echo="0036000016010200361111112222220000000000000000000001";

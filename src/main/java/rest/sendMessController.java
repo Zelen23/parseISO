@@ -4,6 +4,7 @@ import com.mycompany.iso8583.ConstructorMess;
 import org.jpos.iso.ISOUtil;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
+import com.mycompany.iso8583.ConnectMux;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,19 +29,20 @@ public class sendMessController {
     public Response send (@RequestParam(value = "mess") String mess,@RequestBody Request request){
         final  Response response;
 
-
             String messInResp=request.getSendMessage();
             if(messInResp!=""){
 
-                new parse().parsers(messInResp);
+                //new parse().parsers(messInResp);
+                byte[] c=ISOUtil.hex2byte(messInResp);
 
+                new Application().upd(c);
             }
 
         HashMap<String, Object> list=new LinkedHashMap<String, Object>();
             list.put("1","2");
 
-        System.out.println("getMess "+messInResp );
-        System.out.println("mess "+mess );
+       // System.out.println("getMess "+messInResp );
+       // System.out.println("mess "+mess );
 
         response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
 
