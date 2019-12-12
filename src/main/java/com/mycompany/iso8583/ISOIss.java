@@ -6,30 +6,7 @@
 package com.mycompany.iso8583;
 
 
-import org.jpos.iso.IFB_AMOUNT;
-import org.jpos.iso.IFB_BINARY;
-import org.jpos.iso.IFB_BITMAP;
-
-import org.jpos.iso.IFB_HEX;
-
-import org.jpos.iso.IFB_LLCHAR;
-import org.jpos.iso.IFB_LLHBINARY;
-
-import org.jpos.iso.IFB_LLHECHAR;
-
-import org.jpos.iso.IFB_LLHNUM;
-
-import org.jpos.iso.IFB_LLLCHAR;
-
-import org.jpos.iso.IFB_LLNUM;
-import org.jpos.iso.IFB_NUMERIC;
-
-import org.jpos.iso.IFE_CHAR;
-
-import org.jpos.iso.IF_CHAR;
-
-import org.jpos.iso.ISOBasePackager;
-import org.jpos.iso.ISOFieldPackager;
+import org.jpos.iso.*;
 
 /**
  *
@@ -39,7 +16,7 @@ public class ISOIss  extends ISOBasePackager{
         private static final boolean pad = false;
     protected ISOFieldPackager fld[] = {
             new IFB_NUMERIC (  4, "MESSAGE TYPE INDICATOR",true),
-            new IFB_BITMAP  ( 16, "BIT MAP"),
+            new IFB_BITMAP  ( 32, "BIT MAP"),
             new IFB_LLHNUM   ( 19, "PAN - PRIMARY ACCOUNT NUMBER",pad),
             new IFB_NUMERIC (  6, "PROCESSING CODE", true),
             new IFB_NUMERIC ( 12, "AMOUNT, TRANSACTION", true),
@@ -128,12 +105,12 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_NUMERIC ( 16, "CREDITS, REVERSAL AMOUNT", true),
             new IFB_NUMERIC ( 16, "DEBITS, AMOUNT", true),
             new IFB_NUMERIC ( 16, "DEBITS, REVERSAL AMOUNT", true),
-            new IFB_NUMERIC ( 42, "ORIGINAL DATA ELEMENTS", true),
+     /*90*/ new IFB_NUMERIC ( 42, "ORIGINAL DATA ELEMENTS", true),
             new IF_CHAR     (  1, "FILE UPDATE CODE"),
             new IF_CHAR     (  2, "FILE SECURITY CODE"),
             new IF_CHAR     (  6, "RESPONSE INDICATOR"),
             new IF_CHAR     (  7, "SERVICE INDICATOR"),
-            new IF_CHAR     ( 42, "REPLACEMENT AMOUNTS"),
+     /*95*/ new IFE_CHAR     ( 42, "REPLACEMENT AMOUNTS"),
             new IFB_BINARY  ( 16, "MESSAGE SECURITY CODE"),
             new IFB_AMOUNT  ( 17, "AMOUNT, NET SETTLEMENT", pad),
             new IF_CHAR     ( 25, "PAYEE"),
@@ -164,7 +141,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-            new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
+     /*126*/new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_BINARY  (  8, "MAC 2")
     

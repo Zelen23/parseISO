@@ -1,10 +1,15 @@
 package rest;
 
+import com.mycompany.iso8583.ConnectTest;
 import com.mycompany.iso8583.ConstructorMess;
 import org.jpos.iso.ISOUtil;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
+import com.mycompany.iso8583.ConnectMux;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -27,24 +32,27 @@ public class sendMessController {
     @PostMapping("/send")
     public Response send (@RequestParam(value = "mess") String mess,@RequestBody Request request){
         final  Response response;
-
+        byte []respMux = new byte[0];
+        String resss="";
 
             String messInResp=request.getSendMessage();
-            if(messInResp!=""){
+            if(messInResp!="") {
 
-                new parse().parsers(messInResp);
+                byte[] c = ISOUtil.hex2byte(messInResp);
+                Socket mainSoclet = Application.getMainSocket();
+                ConnectTest connectClass = new ConnectTest();
+
+                try {
+                    connectClass.sendToMux(mainSoclet,c);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
             }
-
-        HashMap<String, Object> list=new LinkedHashMap<String, Object>();
-            list.put("1","2");
-
-        System.out.println("getMess "+messInResp );
-        System.out.println("mess "+mess );
-
+        HashMap<String, Object> list = new LinkedHashMap<String, Object>();
+        list.put("1", ISOUtil.hexString(respMux));
+       //  давать респонс когда получен результат
         response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
-
-
         return response;
     }
 
@@ -56,8 +64,9 @@ public class sendMessController {
 
 
         String raw=request.getRawMessage();
+
         if(raw!=""){
-            HashMap<String, Object> list =new parse().parseToArray(raw);
+            HashMap<String, Object> list =new parse().parseToArray(raw.substring(52));
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS,list);
         }else{
             response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
