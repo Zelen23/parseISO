@@ -14,17 +14,25 @@ import static com.mycompany.iso8583.parse.createEcho810;
 
 public class ConnectMux implements Runnable  {
 
+
+
+    private volatile byte[] myParam;
+
+    public byte[] getResp() {
+        return resp;
+    }
+
+    private volatile byte[] resp;
+
+    public ConnectMux(byte[] myParam) {
+        this.myParam = myParam;
+    }
+
     public byte[] getMyParam() {
         return myParam;
     }
 
     public void setMyParam(byte[] myParam) {
-        this.myParam = myParam;
-    }
-
-    private volatile byte[] myParam;
-
-    public ConnectMux(byte[] myParam) {
         this.myParam = myParam;
     }
 
@@ -51,6 +59,7 @@ public class ConnectMux implements Runnable  {
 
                     Thread.sleep(5000);
 
+
                     System.out.println("connected");
 
                     if(myParam!=null){
@@ -75,6 +84,7 @@ public class ConnectMux implements Runnable  {
                                 String send=header_echo+ISOUtil.hexString(createEcho810(msg));
                                 System.out.println(send);
                                 byte[] c=ISOUtil.hex2byte(send);
+                                //send echo 0810
                                 out.write(c);
                             }
 
@@ -84,6 +94,8 @@ public class ConnectMux implements Runnable  {
 
                     }else{
                         System.out.println("response "+ ISOUtil.hexString(inmess));
+                        resp=inmess;
+
                     }
 
                 }
