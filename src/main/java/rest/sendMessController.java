@@ -42,11 +42,8 @@ public class sendMessController {
                 Socket mainSoclet = Application.getMainSocket();
                 ConnectTest connectClass = new ConnectTest();
 
-                try {
-                    connectClass.sendToMux(mainSoclet,c);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    respMux=  connectClass.sendTo2(mainSoclet,c);
+
 
             }
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
