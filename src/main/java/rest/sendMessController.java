@@ -39,14 +39,12 @@ public class sendMessController {
             if(messInResp!="") {
 
                 byte[] c = ISOUtil.hex2byte(messInResp);
-                Socket mainSoclet = Application.getMainSocket();
-                ConnectTest connectClass = new ConnectTest();
-
-                    respMux=  connectClass.sendTo2(mainSoclet,c);
+                respMux= new Application().sendMess(c);
 
 
             }
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
+           // list=new parse().parseToArray(ISOUtil.hexString(respMux).substring(52));
         list.put("1", ISOUtil.hexString(respMux));
        //  давать респонс когда получен результат
         response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
