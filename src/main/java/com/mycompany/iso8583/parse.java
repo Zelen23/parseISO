@@ -266,6 +266,40 @@ public static void server(){
     }
 
 
+    public byte[] updateRawMess(byte[] raw, String de011){
+    // отхерачит 52 символа
+        String mess=ISOUtil.hexString(raw).substring(52);
+        String header_echo=ISOUtil.hexString(raw).substring(0,52);
+        byte[] updr = new byte[0];
+
+        ISOMsg msg = new ISOMsg();
+        byte[] c=ISOUtil.hex2byte(mess);
+        msg.setPackager(new ISOIss());
+        SimpleDateFormat sdf= new SimpleDateFormat("MMddHHmmss");
+        String de007=sdf.format(new Date());
+        SimpleDateFormat sdf2= new SimpleDateFormat("HHmmss");
+        String de012=sdf2.format(new Date());
+
+        try {
+            msg.unpack(c);
+            msg.set(7,de007);//1213153223
+            msg.set(11,de011);//000927
+            msg.set(12,de012); //153223
+            msg.set(37,"934714"+de011);//934715000927
+
+            byte[] data = msg.pack();
+            String message = ISOUtil.hexString(data);
+            System.out.println( "updateRawMess "+header_echo+message);
+
+            updr=ISOUtil.hex2byte(header_echo+message);
+
+
+        } catch (ISOException e) {
+            e.printStackTrace();
+        }
+
+        return  updr;
+    }
 
 public HashMap<String, Object> parseToArray(String rawMessage){
 

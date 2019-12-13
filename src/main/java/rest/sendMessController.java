@@ -36,11 +36,14 @@ public class sendMessController {
         String resss="";
 
             String messInResp=request.getSendMessage();
+            String de011=request.getDe011();
             if(messInResp!="") {
 
                 byte[] c = ISOUtil.hex2byte(messInResp);
-                respMux= new Application().sendMess(c);
+                byte[] d=new parse().updateRawMess(c,de011);
+                respMux= new Application().sendMess(d);
 
+                System.out.println("getResp "+ISOUtil.hexString(respMux));
 
             }
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
@@ -59,9 +62,15 @@ public class sendMessController {
 
 
         String raw=request.getRawMessage();
+        String de011=request.getDe011();
 
         if(raw!=""){
-            HashMap<String, Object> list =new parse().parseToArray(raw.substring(52));
+
+            byte[] c = ISOUtil.hex2byte(raw);
+            byte[] d=new parse().updateRawMess(c,de011);
+            String pars=ISOUtil.hexString(d);
+
+            HashMap<String, Object> list =new parse().parseToArray(pars.substring(52));
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS,list);
         }else{
             response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
