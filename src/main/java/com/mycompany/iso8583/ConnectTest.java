@@ -21,14 +21,10 @@ public class ConnectTest  implements   Runnable{
         this.mess = mess;
     }
 
-
     public Socket getConnect() {
         return connect;
     }
-
     private Socket connect;
-
-
 
 
     @Override
@@ -42,13 +38,12 @@ public class ConnectTest  implements   Runnable{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byte[] redData = new byte[0];
-        out.println("srarted");
 
         while (true) {
-
             try {
                 connect = server.accept();
+
+
                 if(connect.getInputStream().read()==-1){
                     out.println("WTF");
                 }
@@ -59,6 +54,72 @@ public class ConnectTest  implements   Runnable{
         }
 
     }
+
+    public byte[] checkecho( Socket conn,byte [] byteMess) {
+
+        byte[] redData = new byte[0];
+        //Socket conn=connectToMux();
+        try {
+
+            try {
+
+                if(!conn.isClosed()){
+                    connect.setSoTimeout(10000);
+
+                    OutputStream oup = conn.getOutputStream();
+                    InputStream inp=conn.getInputStream();
+                    int red = -1;
+                    byte[] buffer = new byte[1024];
+                    oup.write(byteMess);
+                    oup.flush();
+
+                    //if(){
+                    //
+                    //  out.flush();
+                    //  break выскочить из первого ифа}//если клиент не отвечает то закрывать
+                    //теряем первый байт 00
+                    byte[] data = new byte[1024];
+                    int count = inp.read(data);
+                    System.out.println("countofBute :" + count);
+                    redData = new byte[count];
+                    System.arraycopy(data, 0, redData, 0, count);
+                    System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
+
+
+                   /* while ((red = inp.read(buffer)) > -1) {
+
+                        redData = new byte[red];
+                        System.out.println("Data From buffer :" + ISOUtil.hexString(buffer) +"  count red "+red);
+
+                        System.arraycopy(buffer, 0, redData, 0, red);
+
+                        System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
+
+                    return redData;
+                    }*/
+                    inp.close();
+                    oup.close();
+
+                    conn.close();
+
+                    return redData;
+                }
+
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+return redData;
+    }
+
+
+
 
     public Socket connectToMux() {
 
@@ -77,54 +138,9 @@ public class ConnectTest  implements   Runnable{
 
         return connect;
 
-            // get resp cut header
+        // get resp cut header
 
-        }
-
-    public byte[] checkecho( Socket conn,byte [] byteMess) {
-
-        byte[] redData = new byte[0];
-        //Socket conn=connectToMux();
-        try {
-
-            try {
-
-                if(conn.isConnected()){
-
-                    OutputStream oup = conn.getOutputStream();
-                    InputStream inp=conn.getInputStream();
-                    int red = -1;
-                    byte[] buffer = new byte[5 * 1024]; // a read buffer of 5KiB
-                    oup.write(byteMess);
-
-                    while ((red = inp.read(buffer)) > -1) {
-
-                        redData = new byte[red];
-                        System.arraycopy(buffer, 0, redData, 0, red);
-
-                        System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
-
-                    return redData;
-                    }
-                }else{
-
-                    System.out.println("disconect");
-                }
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-return redData;
     }
-
-
     public byte[] sendToMux(Socket conn, byte[] byteMess) throws IOException {
 
         DataOutputStream out;
