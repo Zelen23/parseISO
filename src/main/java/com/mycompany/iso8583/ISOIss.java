@@ -119,7 +119,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLCHAR  ( 17, "FILE NAME"),
             new IFB_LLCHAR  ( 28, "ACCOUNT IDENTIFICATION 1"),
             new IFB_LLCHAR  ( 28, "ACCOUNT IDENTIFICATION 2"),
-            new IFB_LLLCHAR (100, "TRANSACTION DESCRIPTION"),
+   /*104*/  new IFB_LLHBINARY (255, "TRANSACTION DESCRIPTION"),
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 

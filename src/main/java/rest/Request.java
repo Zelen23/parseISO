@@ -1,5 +1,8 @@
 package rest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Request {
 
     public String getSendMessage() {
@@ -31,4 +34,15 @@ public class Request {
     }
 
     private String de011;
+
+
+    public HashMap<String, Object> getData() {
+        return data;
+    }
+
+    public void setData(HashMap<String, Object> data) {
+        this.data = data;
+    }
+
+    private HashMap<String, Object> data;
 }

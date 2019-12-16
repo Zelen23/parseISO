@@ -265,8 +265,7 @@ public static void server(){
 
     }
 
-
-    public byte[] updateRawMess(byte[] raw, String de011){
+public byte[] updateRawMess(byte[] raw, String de011){
     // отхерачит 52 символа
         String mess=ISOUtil.hexString(raw).substring(52);
         String header_echo=ISOUtil.hexString(raw).substring(0,52);
@@ -281,11 +280,13 @@ public static void server(){
         String de012=sdf2.format(new Date());
 
         try {
+
             msg.unpack(c);
+            String de037=msg.getString(37).substring(0,6);
             msg.set(7,de007);//1213153223
             msg.set(11,de011);//000927
             msg.set(12,de012); //153223
-            msg.set(37,"934714"+de011);//934715000927
+            msg.set(37,de037+de011);//934715000927
 
             byte[] data = msg.pack();
             String message = ISOUtil.hexString(data);
@@ -300,12 +301,10 @@ public static void server(){
 
         return  updr;
     }
-
 public HashMap<String, Object> parseToArray(String rawMessage){
 
 
     HashMap<String, Object> list=new LinkedHashMap<String, Object>();
-
     ISOMsg msg = new ISOMsg();
 
     try {
@@ -318,7 +317,8 @@ public HashMap<String, Object> parseToArray(String rawMessage){
         list.put("mti",cat);
         for (int i=1;i<=msg.getMaxField();i++) {
             if (msg.hasField(i)) {
-                list.put("de-"+i,msg.getString(i));
+                // de011
+                list.put("de"+String.format("%03d", i),msg.getString(i));
             }
 
         }
@@ -333,7 +333,103 @@ return list;
 
 
 
+public String createMess(HashMap<String,Object > mess){
+    //приходит json
+    // считаю поля
+    // создаю ISO mess  в цикле значение добавляю в mess  если значение * то поздаю по  наблоизатору
+    ISOMsg msg = new ISOMsg();
+    msg.setPackager(new ISOIss());
+    String hexSize = null;
+
+    byte[]packbody=null;
+    for (Map.Entry<String, Object> obj : mess.entrySet()) {
+
+        if(obj.getKey()=="mti"){
+            try {
+                msg.setMTI(obj.getValue().toString());
+            } catch (ISOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            int key =parseKey(obj.getKey());
+            if(obj.getValue().toString().equals("*")){
+                msg.set(key,autogenerate(key));
+            }else{
+                msg.set(key,obj.getValue().toString());
+            }
+
+        }
+
+    }
 
 
-    
+    try {
+        packbody= msg.pack();
+
+    } catch (ISOException e) {
+        e.printStackTrace();
+    }
+    int size=packbody.length+22;
+         hexSize=String.format("%04X", size);
+
+
+
+
+    String header=hexSize +"0000160102" +hexSize +"0000008598220000000000000000000000";
+
+
+return header+ISOUtil.hexString(packbody);
+}
+
+public  Integer parseKey(String keyFromHashMap){
+
+    Integer key=Integer.parseInt(keyFromHashMap.split("de")[1]);
+
+    return key;
+}
+
+public String  autogenerate(Integer fieldNumber){
+    String value="";
+    SimpleDateFormat sdf= new SimpleDateFormat("MMddHHmmss");
+    String de007=sdf.format(new Date());
+    SimpleDateFormat sdf2= new SimpleDateFormat("HHmmss");
+    String de012=sdf2.format(new Date());
+    switch (fieldNumber){
+        /*  msg.set(7,de007);//1213153223
+            msg.set(11,de011);//000927
+            msg.set(12,de012); //153223
+            msg.set(37,de037+de011);//934715000927*/
+
+        case  7:
+            value=de007;
+            break;
+        case  11:
+            value="000927";
+            break;
+        case  12:
+            value=de012;
+            break;
+        case  37:
+            value="934715000927";
+            break;
+
+    }
+    return value;
+}
+
+public Integer header(byte[]  rawMess){
+
+    /*ингода не приходит первый байт
+    * тогда заголовок ситановится 50
+    * для парсинга сообщения нужнооторвать заголовок
+    * этот костыль находит длинну заголовка*/
+    String []x=ISOUtil.hexString(rawMess).substring(0,52).split("000000859822");
+ if(x[0].length()==18){
+     return  52;
+ }else{
+     return 50;
+ }
+
+}
+
 }

@@ -27,6 +27,13 @@ public class Application {
 
     public byte[] sendMess(byte[]mess){
          Socket conn=connect.getConnect();
+         if(conn.isConnected()){
+             System.out.println("started");
+         }else{
+             System.out.println("disconnect");
+             return null;
+
+         }
         return connect.checkecho(conn,mess);
 
 

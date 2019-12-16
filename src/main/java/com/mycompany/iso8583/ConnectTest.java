@@ -39,7 +39,7 @@ public class ConnectTest  implements   Runnable{
             e.printStackTrace();
         }
 
-        while (true) {
+       // while (true) {
             try {
                 connect = server.accept();
 
@@ -51,7 +51,7 @@ public class ConnectTest  implements   Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+      //  }
 
     }
 
@@ -80,13 +80,15 @@ public class ConnectTest  implements   Runnable{
                     //теряем первый байт 00
                     byte[] data = new byte[1024];
                     int count = inp.read(data);
-                    System.out.println("countofBute :" + count);
+
+                    //System.out.println("countofBute :" + count);
+
                     redData = new byte[count];
                     System.arraycopy(data, 0, redData, 0, count);
                     System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
 
-
-                   /* while ((red = inp.read(buffer)) > -1) {
+/*
+                   while ((red = inp.read(buffer)) > -1) {
 
                         redData = new byte[red];
                         System.out.println("Data From buffer :" + ISOUtil.hexString(buffer) +"  count red "+red);
@@ -96,11 +98,13 @@ public class ConnectTest  implements   Runnable{
                         System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
 
                     return redData;
-                    }*/
-                    inp.close();
-                    oup.close();
+                    }
+                    */
 
-                    conn.close();
+                    //inp.close();
+                   // oup.close();
+
+                   // conn.close();
 
                     return redData;
                 }
