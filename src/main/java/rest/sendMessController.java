@@ -82,11 +82,6 @@ public class sendMessController {
             response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
         }
 
-
-
-
-
-
         return response;
 
     }
@@ -105,13 +100,18 @@ public class sendMessController {
             byte[] c = ISOUtil.hex2byte(rawRequest);
             respMux= new Application().sendMess(c);
         }
-        HashMap<String, Object> list =new HashMap<String, Object>();
-        Integer sizeHeader=new parse().header(respMux);
-        HashMap<String, Object> resp = new parse().parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
-        list.put("rawRequest",rawRequest);
-        list.put("data",resp);
+        if(respMux!=null){
+            HashMap<String, Object> list =new HashMap<String, Object>();
+            Integer sizeHeader=new parse().header(respMux);
+            HashMap<String, Object> resp = new parse().parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
+            list.put("rawRequest",rawRequest);
+            list.put("data",resp);
 
-        response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
+            response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
+        }else{
+            response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
+
+        }
         return response;
     }
 }

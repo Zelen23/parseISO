@@ -1,7 +1,5 @@
 package com.mycompany.iso8583;
 
-import org.jpos.iso.ISOException;
-import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
 
 import java.io.*;
@@ -10,13 +8,14 @@ import java.net.Socket;
 
 import static java.lang.System.out;
 
-public class ConnectTest  implements   Runnable{
+public class ConnectTest implements Runnable {
 
     /*апи посылает сообшение с параметром
      * если пришел параметр от апи то пускаю его и жду ответа
      * если ответа нет то  нет респонса*/
 
-    private  volatile byte[] mess;
+    private volatile byte[] mess;
+
     public void setMess(byte[] mess) {
         this.mess = mess;
     }
@@ -24,6 +23,7 @@ public class ConnectTest  implements   Runnable{
     public Socket getConnect() {
         return connect;
     }
+
     private Socket connect;
 
 
@@ -31,7 +31,7 @@ public class ConnectTest  implements   Runnable{
     public void run() {
 
         ServerSocket server = null;
-         connect=new Socket();
+        connect = new Socket();
         try {
             server = new ServerSocket(3111);
 
@@ -39,23 +39,23 @@ public class ConnectTest  implements   Runnable{
             e.printStackTrace();
         }
 
-       // while (true) {
-            try {
-                connect = server.accept();
+        // while (true) {
+        try {
+            connect = server.accept();
 
 
-                if(connect.getInputStream().read()==-1){
-                    out.println("WTF");
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (connect.getInputStream().read() == -1) {
+                out.println("WTF");
             }
-      //  }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //  }
 
     }
 
-    public byte[] checkecho( Socket conn,byte [] byteMess) {
+    public byte[] checkecho(Socket conn, byte[] byteMess) {
 
         byte[] redData = new byte[0];
         //Socket conn=connectToMux();
@@ -63,52 +63,34 @@ public class ConnectTest  implements   Runnable{
 
             try {
 
-                if(!conn.isClosed()){
+                if (!conn.isClosed()) {
                     connect.setSoTimeout(10000);
 
                     OutputStream oup = conn.getOutputStream();
-                    InputStream inp=conn.getInputStream();
+                    InputStream inp;
                     int red = -1;
                     byte[] buffer = new byte[1024];
                     oup.write(byteMess);
                     oup.flush();
+                    inp = conn.getInputStream();
 
-                    //if(){
-                    //
-                    //  out.flush();
-                    //  break выскочить из первого ифа}//если клиент не отвечает то закрывать
-                    //теряем первый байт 00
-                    byte[] data = new byte[1024];
-                    int count = inp.read(data);
+                    while ((red = inp.read(buffer)) > -1) {
 
-                    //System.out.println("countofBute :" + count);
+                        if (red < 20) {
+                            out.println("echo");
+                        } else {
+                            redData = new byte[red];
+                            System.arraycopy(buffer, 0, redData, 0, red);
+                            System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
 
-                    redData = new byte[count];
-                    System.arraycopy(data, 0, redData, 0, count);
-                    System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
+                            return redData;
+                        }
 
-/*
-                   while ((red = inp.read(buffer)) > -1) {
-
-                        redData = new byte[red];
-                        System.out.println("Data From buffer :" + ISOUtil.hexString(buffer) +"  count red "+red);
-
-                        System.arraycopy(buffer, 0, redData, 0, red);
-
-                        System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
-
-                    return redData;
                     }
-                    */
 
-                    //inp.close();
-                   // oup.close();
-
-                   // conn.close();
 
                     return redData;
                 }
-
 
 
             } catch (IOException e) {
@@ -119,20 +101,18 @@ public class ConnectTest  implements   Runnable{
             e.printStackTrace();
         }
 
-return redData;
+        return redData;
     }
-
-
 
 
     public Socket connectToMux() {
 
 
         ServerSocket server = null;
-        Socket connect=new Socket();
+        Socket connect = new Socket();
         try {
             server = new ServerSocket(3111);
-            connect=server.accept();
+            connect = server.accept();
 
 
         } catch (IOException e) {
@@ -145,23 +125,24 @@ return redData;
         // get resp cut header
 
     }
+
     public byte[] sendToMux(Socket conn, byte[] byteMess) throws IOException {
 
         DataOutputStream out;
         BufferedReader reader;
         DataInputStream in;
-        String resp="";
+        String resp = "";
 
         byte[] inmess = new byte[0];
 
 
-        if(conn.isConnected()) {
+        if (conn.isConnected()) {
             out = new DataOutputStream(new DataOutputStream(conn.getOutputStream()));
-            in= new DataInputStream(new DataInputStream(conn.getInputStream()));
-            reader= new BufferedReader( new InputStreamReader(conn.getInputStream()));
+            in = new DataInputStream(new DataInputStream(conn.getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             //send mess
             out.write(byteMess);
-            resp =reader.readLine();
+            resp = reader.readLine();
         }
 
         // reader.readLine();
@@ -169,9 +150,6 @@ return redData;
 
         return resp.getBytes();
     }
-
-
-
 
 
 }
