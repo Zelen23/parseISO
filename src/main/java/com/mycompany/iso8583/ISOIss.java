@@ -60,7 +60,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFE_CHAR     ( 15, "CARD ACCEPTOR IDENTIFICATION CODE" ),
             new IFE_CHAR     ( 40, "CARD ACCEPTOR NAME/LOCATION"),
 /*44ANS V*/ new IFB_LLHECHAR  ( 25, "ADITIONAL RESPONSE DATA"),
-            new IFE_CHAR  ( 76, "TRACK 1 DATA"),
+            new IFB_LLHECHAR  ( 76, "TRACK 1 DATA"),
             new IFE_CHAR (1, "ADITIONAL DATA - ISO"),
             new IFE_CHAR (1, "ADITIONAL DATA - NATIONAL"),
             new IFB_LLHECHAR (255, "ADITIONAL DATA - PRIVATE"),
