@@ -11,12 +11,27 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bouncycastle.util.encoders.Hex;
+import org.jpos.core.SimpleConfiguration;
 import org.jpos.iso.*;
+import org.jpos.iso.packager.Base1Packager;
+import org.jpos.iso.packager.Base1_BITMAP126;
+import org.jpos.iso.packager.GenericPackager;
+import org.jpos.security.*;
+import org.jpos.security.jceadapter.JCESecurityModule;
+
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.security.auth.login.Configuration;
 
 
 /**
@@ -74,14 +89,37 @@ public HashMap<String, Object> parseToArray(String rawMessage){
 
         byte[] c=ISOUtil.hex2byte(rawMessage);
         msg.setPackager(new ISOIss());
+        //msg.setPackager(new Base1Packager());
         msg.unpack(c);
 
         String cat = msg.getMTI();
         list.put("mti",cat);
         for (int i=1;i<=msg.getMaxField();i++) {
             if (msg.hasField(i)) {
-                // de011
                 list.put("de"+String.format("%03d", i),msg.getString(i));
+                if(i==126){
+
+                    //Map maps = msg.getComponent(126).getChildren();
+
+                    ISOComponent comp = msg.getComponent(126);
+                    ISOIss.F126Packager pp = new ISOIss.F126Packager();
+                    HashMap <String,String>f126 = new HashMap<>();
+                    ISOMsg subIso=new ISOMsg();
+                    subIso.setPackager(pp);
+
+                    subIso.unpack(comp.pack());
+                    for (int j=1;j<=subIso.getMaxField();j++) {
+
+                        if (subIso.hasField(j)) {
+                            f126.put(""+j,subIso.getString(j));
+                        }
+                    }
+
+                    list.put("de"+String.format("%03d", i),f126);
+
+
+
+                }
             }
 
         }
@@ -193,9 +231,7 @@ public Integer header(byte[]  rawMess){
 
 }
 
-
-
-    public  ISOMsg parsers(String  message){
+public  ISOMsg parsers(String  message){
         ISOMsg msg = new ISOMsg();
         System.out.println(" --- "+message );
 
@@ -228,8 +264,7 @@ public Integer header(byte[]  rawMess){
 
         return msg;
     }
-
-    public static byte[] packmessSmoll() {
+public static byte[] packmessSmoll() {
 
         String message="";
         byte[] data = null;
@@ -287,7 +322,7 @@ public Integer header(byte[]  rawMess){
 
     }
 
-    public static byte[] createEcho(){
+public static byte[] createEcho(){
         byte[] data=null;
         String header_echo="0036000016010200361111112222220000000000000000000001";
         SimpleDateFormat sdf= new SimpleDateFormat("MMddHHmmss");
@@ -315,7 +350,7 @@ public Integer header(byte[]  rawMess){
 
         return data;
     }
-    public static byte[] createEcho810(ISOMsg isoMsg){
+public static byte[] createEcho810(ISOMsg isoMsg){
         byte[] data=null;
         String header_echo="0036000016010200361111112222220000000000000000000001";
         //String header_echo="003E0000160102003E0000008598220000000000000000000000";
@@ -338,14 +373,14 @@ public Integer header(byte[]  rawMess){
         return data;
     }
 
-    public void checkREsp(String resp){
+public void checkREsp(String resp){
 
         String mes=resp.substring(52);
         //parsers(mes);
 
 
     }
-    public static void server(){
+public static void server(){
         DataInputStream in;
         DataOutputStream out;
         String header_echo="0036000016010200361111112222220000000000000000000001";
@@ -381,7 +416,7 @@ public Integer header(byte[]  rawMess){
 
 
     }
-    public static byte[] packmess() {
+public static byte[] packmess() {
 
 
         String message1="0100763C669128E0BA16104785299000235458010000000000000011000000000011120416382300077216382312042005601108400700000100C4F0F0F0F0F0F0F0F00B0123456789012504785299000235458D20052011372500000201F9F3F3F8F1F6F0F0F0F7F7F2C1E3D4F0F1404040C3C1D9C440C1C3C3C5D7E3D6D94040C1C3D8E4C9D9C5D940D5C1D4C5404040404040404040404040C3C9E3E840D5C1D4C540404040E4E208400840DAE7386BEA0B25162001010100000000660100639F7C0A000000000000000000009F3303204000950580000100009F37049BADBCAB9F100706011103A0B0009F260892B379D36CA348049F3602000D82023C009C01009F1A0208269A031804279F02060000000000005F2A0208268407A00000000310100128080000000000000000058000000002";
@@ -416,4 +451,68 @@ Received de090:012000000000000000001234567890100000000000*/
         return  c;
 
     }
+
+
+public static byte[] processByPAN(String pin,String pan){
+        try {
+            //
+            byte[] pinBytes = pin.getBytes();
+
+            pan = ISOUtil.padleft(pan, 16, '0');
+            byte[] accountNoBytes = ISOUtil.hex2byte(pan);
+            byte[] resultBytes = new byte[8];
+            //PIN BLOCK
+            for (int i = 0; i < 8; i++) {
+                resultBytes[i] = (byte) (pinBytes[i] ^ accountNoBytes[i]);
+            }
+            return resultBytes;
+        } catch (ISOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+public  void pack126(){
+
+    ISOMsg msg2 = new ISOMsg();
+
+
+    try {
+        ISOMsg subf = new ISOMsg();
+        subf.set(10,"000842");
+        subf.setFieldNumber(126);
+
+        msg2.setMTI("0100");
+        msg2.set(2,"4785297631668352");
+        msg2.set(subf);
+
+        msg2.setPackager(new ISOIss());
+        System.out.println( ISOUtil.hexString( msg2.pack()));
+    } catch (ISOException e) {
+        e.printStackTrace();
+    }
+
+}
+public void pack2()
+{
+    ISOMsg msg=new ISOMsg();
+    ISOMsg msg126=new ISOMsg(126);
+    msg.setPackager(new ISOIss());
+
+    ISOField f126_10=new ISOField(10,"000842");
+
+    try {
+        msg126.set(f126_10);
+
+        msg.setMTI("0100");
+        msg.set(2,"4785297631668352");
+        msg.set(msg126);
+        System.out.println( ISOUtil.hexString( msg.pack()));
+    } catch (ISOException e) {
+        e.printStackTrace();
+    }
+
+
+}
+
 }

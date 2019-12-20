@@ -7,6 +7,9 @@ package com.mycompany.iso8583;
 
 
 import org.jpos.iso.*;
+import org.jpos.iso.packager.Base1Packager;
+import org.jpos.iso.packager.Base1SubFieldPackager;
+import org.jpos.iso.packager.Base1_BITMAP126;
 
 /**
  *
@@ -141,7 +144,11 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-     /*126*/new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
+     /*126*///new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
+            new ISOMsgFieldPackager(
+                    new IFB_LLHBINARY (255, "Field 126"),
+                    new F126Packager()),
+
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_BINARY  (  8, "MAC 2")
     
@@ -157,6 +164,50 @@ public class ISOIss  extends ISOBasePackager{
         super();
         setFieldPackager(fld);
     }
-    
-    
+
+
+
+    protected static class F126Packager extends Base1SubFieldPackager
+    {
+        protected ISOFieldPackager fld126[] =
+                {
+                        new Base1_BITMAP126(16, "Bit Map"),
+                        new IFE_CHAR     (25, "Customer Name"),
+                        new IFE_CHAR     (57, "Customer Address"),
+                        new IFE_CHAR     (57, "Biller Address"),
+                        new IFE_CHAR     (18, "Biller Telephone Number"),
+                        new IFE_CHAR     (6,  "Process By Date"),
+                        new IFB_LLNUM    (17, "Cardholder Cert Serial Number", true),
+                        new IFB_LLNUM    (17, "Merchant Cert Serial Number", true),
+                        new IFB_NUMERIC  (40, "Transaction ID", true),
+                        new IFB_NUMERIC  (40, "TransStain", true),
+                        new IFE_CHAR     (6,  "CVV2 Request Data"),
+                };
+
+        protected F126Packager ()
+        {
+            super();
+            setFieldPackager(fld126);
+        }
+    }
+
+    protected static class F127Packager extends ISOBasePackager
+    {
+        protected ISOFieldPackager fld127[] =
+                {
+                        new IFE_CHAR    (1,   "FILE UPDATE COD"),
+                        new IFB_LLHNUM  (19,  "ACCOUNT NUMBER", true),
+                        new IFB_NUMERIC (4,   "PURGE DATE", true),
+                        new IFE_CHAR    (2,   "ACTION CODE"),
+                        new IFE_CHAR    (9,   "REGION CODING"),
+                        new IFB_NUMERIC (4,   "FILLER", true),
+                };
+        protected F127Packager ()
+        {
+            super();
+            setFieldPackager(fld127);
+        }
+    }
+
+
 }
