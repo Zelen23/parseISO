@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static java.lang.System.in;
 import static java.lang.System.out;
 
 public class ConnectTest implements Runnable {
@@ -43,11 +44,6 @@ public class ConnectTest implements Runnable {
         try {
             connect = server.accept();
 
-
-            if (connect.getInputStream().read() == -1) {
-                out.println("WTF");
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,18 +63,23 @@ public class ConnectTest implements Runnable {
                     connect.setSoTimeout(10000);
 
                     OutputStream oup = conn.getOutputStream();
-                    InputStream inp;
+                    InputStream inp=conn.getInputStream();
+
                     int red = -1;
                     byte[] buffer = new byte[1024];
                     oup.write(byteMess);
                     oup.flush();
-                    inp = conn.getInputStream();
+
+
 
                     while ((red = inp.read(buffer)) > -1) {
 
-                        if (red < 20) {
-                            out.println("echo");
+                        if (ISOUtil.hexString(buffer).lastIndexOf("859822")==-1) {
+                            out.println("echo "+ISOUtil.hexString(buffer));
                         } else {
+                            /*Допустим iso-шка  распрасить посмотреть на de011
+                            * спереди может быть куча 00000000
+                            * пределить длинну header*/
                             redData = new byte[red];
                             System.arraycopy(buffer, 0, redData, 0, red);
                             System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
