@@ -23,10 +23,10 @@ import org.jpos.iso.*;
  *
  * @author adolf
  */
+
 public class parse {
 
-    static Integer de011 = 100001;
-
+    ConfigFile config=new ConfigFile();
 
     public byte[] updateRawMess(byte[] raw, String de011) {
         // отхерачит 52 символа
@@ -67,7 +67,6 @@ public class parse {
 
     public HashMap<String, Object> parseToArray(String rawMessage) {
 
-
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
         ISOMsg msg = new ISOMsg();
 
@@ -75,7 +74,6 @@ public class parse {
 
             byte[] c = ISOUtil.hex2byte(rawMessage);
             msg.setPackager(new ISOIss());
-            //msg.setPackager(new Base1Packager());
             msg.unpack(c);
 
             String cat = msg.getMTI();
@@ -84,8 +82,6 @@ public class parse {
                 if (msg.hasField(i)) {
                     list.put("de" + String.format("%03d", i), msg.getString(i));
                     if (i == 126) {
-
-                        //Map maps = msg.getComponent(126).getChildren();
 
                         ISOComponent comp = msg.getComponent(126);
                         ISOIss.F126Packager pp = new ISOIss.F126Packager();
@@ -116,7 +112,17 @@ public class parse {
 
         return list;
     }
+    public Integer headerDynamic(byte[] rawMess) {
 
+        String splitter= config.getParams("header.const");
+
+        String[] x = ISOUtil.hexString(rawMess).split(splitter);
+        Integer size=x[0].length()+splitter.length()+22;
+        System.out.println("HeaderSize "+size);
+
+        return size;
+
+    }
     public String createMess(HashMap<String, Object> mess) {
         //приходит json
         // считаю поля
@@ -172,7 +178,8 @@ public class parse {
         hexSize = String.format("%04X", size);
 
 
-        String header = hexSize + "0000160102" + hexSize + "0000008598220000000000000000000000";
+        String headConst=config.getParams("header.const");
+        String header = hexSize + "0000160102" + hexSize +headConst +"0000000000000000000000";
 
 
         return header + ISOUtil.hexString(packbody);
@@ -192,10 +199,6 @@ public class parse {
         SimpleDateFormat sdf2 = new SimpleDateFormat("HHmmss");
         String de012 = sdf2.format(new Date());
         switch (fieldNumber) {
-        /*  msg.set(7,de007);//1213153223
-            msg.set(11,de011);//000927
-            msg.set(12,de012); //153223
-            msg.set(37,de037+de011);//934715000927*/
 
             case 7:
                 value = de007;
@@ -214,41 +217,8 @@ public class parse {
         return value;
     }
 
-    public Integer headerDynamic(byte[] rawMess, String splitter) {
-
-        /*ингода не приходит первый байт
-         * тогда заголовок ситановится 50
-         * для парсинга сообщения нужнооторвать заголовок
-         * этот костыль находит длинну заголовка
-         *
-         * */
-
-        String[] x = ISOUtil.hexString(rawMess).split(splitter);
-        Integer size=x[0].length()+splitter.length()+22;
-        System.out.println("HeaderSize "+size);
-
-            return size;
-
-    }
 
 
-
-    public Integer header(byte[] rawMess) {
-
-        /*ингода не приходит первый байт
-         * тогда заголовок ситановится 50
-         * для парсинга сообщения нужнооторвать заголовок
-         * этот костыль находит длинну заголовка
-         *
-         * */
-        String[] x = ISOUtil.hexString(rawMess).substring(0, 52).split("000000859822");
-        if (x[0].length() == 18) {
-            return 52;
-        } else {
-            return 50;
-        }
-
-    }
     public ISOMsg parsers(String message) {
         ISOMsg msg = new ISOMsg();
         try {
@@ -334,14 +304,14 @@ public class parse {
         String header_echo = "0036000016010200361111112222220000000000000000000001";
         SimpleDateFormat sdf = new SimpleDateFormat("MMddHHmmss");
         String de007 = sdf.format(new Date());
-        de011 = de011 + 1;
+
         ISOMsg msg = new ISOMsg();
         msg.setPackager(new ISOIss());
         try {
             msg.setMTI("0800");
             msg.set(2, "02044");
             msg.set(7, de007);
-            msg.set(11, String.valueOf(de011));
+            msg.set(11, "000777");
             msg.set(70, "999");
 
 
@@ -381,13 +351,6 @@ public class parse {
         return data;
     }
 
-    public void checkREsp(String resp) {
-
-        String mes = resp.substring(52);
-        //parsers(mes);
-
-
-    }
 
     public static void server() {
         DataInputStream in;
@@ -422,7 +385,6 @@ public class parse {
 
 
     }
-
     public static byte[] packmess() {
 
 
@@ -458,8 +420,6 @@ Received de090:012000000000000000001234567890100000000000*/
         return c;
 
     }
-
-
     public static byte[] processByPAN(String pin, String pan) {
         try {
             //
@@ -478,7 +438,6 @@ Received de090:012000000000000000001234567890100000000000*/
         }
         return null;
     }
-
     public void pack126() {
 
         ISOMsg msg2 = new ISOMsg();
@@ -500,7 +459,6 @@ Received de090:012000000000000000001234567890100000000000*/
         }
 
     }
-
     public ISOMsg packMSG126(Map<String, Object> obj) {
 
         ISOMsg msg126 = new ISOMsg(126);
@@ -518,8 +476,6 @@ Received de090:012000000000000000001234567890100000000000*/
 
         return msg126;
     }
-
-
     public ISOMsg pack2() {
         ISOMsg msg = new ISOMsg();
         ISOMsg msg126 = new ISOMsg(126);

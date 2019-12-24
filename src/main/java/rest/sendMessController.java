@@ -1,19 +1,15 @@
 package rest;
 
-import com.mycompany.iso8583.ConnectTest;
-import com.mycompany.iso8583.ConstructorMess;
+
+import com.mycompany.iso8583.ConfigFile;
 import org.jpos.iso.ISOUtil;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
-import com.mycompany.iso8583.ConnectMux;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/Simulator")
@@ -23,6 +19,7 @@ public class sendMessController {
     private static final String ERROR_STATUS = "error";
     private static final int CODE_SUCCESS = 100;
     private static final int AUTH_FAILURE = 102;
+
 
     @GetMapping
     public Response showStatus(){
@@ -49,7 +46,7 @@ public class sendMessController {
 
         if(respMux.length>1){
 
-            Integer sizeHeader=new parse().headerDynamic(respMux,"000000859822");
+            Integer sizeHeader=new parse().headerDynamic(respMux);
             String body=ISOUtil.hexString(respMux).substring(sizeHeader);
             list=new parse().parseToArray(body);
             }else{
@@ -64,17 +61,12 @@ public class sendMessController {
     public  Response send_r(@RequestParam(value = "mess") String mess,@RequestBody Request request){
         Response response;
 
-
-
         String raw=request.getRawMessage();
-        String de011=request.getDe011();
-
         if(raw!=""){
 
             byte[] c = ISOUtil.hex2byte(raw);
-            //byte[] d=new parse().updateRawMess(c,de011);
             String pars=ISOUtil.hexString(c);
-            Integer size=new parse().headerDynamic(c,"000000859822");
+            Integer size=new parse().headerDynamic(c);
 
             HashMap<String, Object> list =new parse().parseToArray(pars.substring(size));
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS,list);
@@ -93,17 +85,17 @@ public class sendMessController {
         byte []respMux = new byte[0];
         HashMap<String,Object> jsondata=request.getData();
         if(!jsondata.isEmpty()) {
-
             rawRequest= new parse().createMess(jsondata);
-            System.out.println(rawRequest);
-
             byte[] c = ISOUtil.hex2byte(rawRequest);
             respMux= new Application().sendMess(c);
+
+                    System.out.println(rawRequest);
         }
         if(respMux.length>1){
             HashMap<String, Object> list =new HashMap<String, Object>();
-            Integer sizeHeader=new parse().headerDynamic(respMux,"000000859822");
-            HashMap<String, Object> resp = new parse().parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
+            Integer sizeHeader=new parse().headerDynamic(respMux);
+            HashMap<String, Object> resp = new parse()
+                    .parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
             list.put("rawRequest",rawRequest);
             list.put("data",resp);
 
@@ -114,4 +106,5 @@ public class sendMessController {
         }
         return response;
     }
+
 }
