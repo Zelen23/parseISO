@@ -49,7 +49,7 @@ public class sendMessController {
 
         if(respMux.length>1){
 
-            Integer sizeHeader=new parse().header(respMux);
+            Integer sizeHeader=new parse().headerDynamic(respMux,"000000859822");
             String body=ISOUtil.hexString(respMux).substring(sizeHeader);
             list=new parse().parseToArray(body);
             }else{
@@ -74,9 +74,9 @@ public class sendMessController {
             byte[] c = ISOUtil.hex2byte(raw);
             //byte[] d=new parse().updateRawMess(c,de011);
             String pars=ISOUtil.hexString(c);
-            new parse().header(c);
+            Integer size=new parse().headerDynamic(c,"000000859822");
 
-            HashMap<String, Object> list =new parse().parseToArray(pars.substring(52));
+            HashMap<String, Object> list =new parse().parseToArray(pars.substring(size));
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS,list);
         }else{
             response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
@@ -93,16 +93,16 @@ public class sendMessController {
         byte []respMux = new byte[0];
         HashMap<String,Object> jsondata=request.getData();
         if(!jsondata.isEmpty()) {
-           // byte[] c = ISOUtil.hex2byte(messInResp);
+
             rawRequest= new parse().createMess(jsondata);
             System.out.println(rawRequest);
 
             byte[] c = ISOUtil.hex2byte(rawRequest);
             respMux= new Application().sendMess(c);
         }
-        if(respMux!=null){
+        if(respMux.length>1){
             HashMap<String, Object> list =new HashMap<String, Object>();
-            Integer sizeHeader=new parse().header(respMux);
+            Integer sizeHeader=new parse().headerDynamic(respMux,"000000859822");
             HashMap<String, Object> resp = new parse().parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
             list.put("rawRequest",rawRequest);
             list.put("data",resp);

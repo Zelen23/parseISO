@@ -117,8 +117,6 @@ public class parse {
         return list;
     }
 
-    ;
-
     public String createMess(HashMap<String, Object> mess) {
         //приходит json
         // считаю поля
@@ -216,12 +214,33 @@ public class parse {
         return value;
     }
 
+    public Integer headerDynamic(byte[] rawMess, String splitter) {
+
+        /*ингода не приходит первый байт
+         * тогда заголовок ситановится 50
+         * для парсинга сообщения нужнооторвать заголовок
+         * этот костыль находит длинну заголовка
+         *
+         * */
+
+        String[] x = ISOUtil.hexString(rawMess).split(splitter);
+        Integer size=x[0].length()+splitter.length()+22;
+        System.out.println("HeaderSize "+size);
+
+            return size;
+
+    }
+
+
+
     public Integer header(byte[] rawMess) {
 
         /*ингода не приходит первый байт
          * тогда заголовок ситановится 50
          * для парсинга сообщения нужнооторвать заголовок
-         * этот костыль находит длинну заголовка*/
+         * этот костыль находит длинну заголовка
+         *
+         * */
         String[] x = ISOUtil.hexString(rawMess).substring(0, 52).split("000000859822");
         if (x[0].length() == 18) {
             return 52;
@@ -230,23 +249,11 @@ public class parse {
         }
 
     }
-
     public ISOMsg parsers(String message) {
         ISOMsg msg = new ISOMsg();
-        System.out.println(" --- " + message);
-
-
         try {
-
             byte[] c = ISOUtil.hex2byte(message);
-
-            // Create ISO Message
-
-            //GenericPackager packager = new GenericPackager("src/resources/grab.xml");
-
-            //msg.setPackager(packager);
             msg.setPackager(new ISOIss());
-            // msg.unpack(packmessSmoll());
             msg.unpack(c);
 
             String cat = msg.getMTI();
@@ -257,7 +264,6 @@ public class parse {
                 }
 
             }
-            System.out.print(cat);
         } catch (ISOException ex) {
             Logger.getLogger(parse.class.getName()).log(Level.SEVERE, null, ex);
         }

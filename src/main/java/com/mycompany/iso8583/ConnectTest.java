@@ -1,13 +1,14 @@
 package com.mycompany.iso8583;
 
+import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
-import static java.lang.System.in;
-import static java.lang.System.out;
+import static java.lang.System.*;
 
 public class ConnectTest implements Runnable {
 
@@ -60,7 +61,7 @@ public class ConnectTest implements Runnable {
             try {
 
                 if (!conn.isClosed()) {
-                    connect.setSoTimeout(10000);
+                    connect.setSoTimeout(30000);
 
                     OutputStream oup = conn.getOutputStream();
                     InputStream inp=conn.getInputStream();
@@ -70,27 +71,40 @@ public class ConnectTest implements Runnable {
                     oup.write(byteMess);
                     oup.flush();
 
-
-
                     while ((red = inp.read(buffer)) > -1) {
 
-                        if (ISOUtil.hexString(buffer).lastIndexOf("859822")==-1) {
-                            out.println("echo "+ISOUtil.hexString(buffer));
+                        if (ISOUtil.hexString(buffer).lastIndexOf("000000859822")==-1) {
+                            out.println("echo "+ISOUtil.hexString(buffer).substring(0,red));
                         } else {
                             /*Допустим iso-шка  распрасить посмотреть на de011
                             * спереди может быть куча 00000000
                             * пределить длинну header*/
                             redData = new byte[red];
                             System.arraycopy(buffer, 0, redData, 0, red);
-                            System.out.println("Data From Client2 :" + ISOUtil.hexString(redData));
+                            String respStr= ISOUtil.hexString(redData);
+                            System.out.println("Data From Mux :" +respStr);
 
-                            return redData;
+                            ISOMsg request= new parse().parsers(ISOUtil.hexString(byteMess).substring(52));
+
+                            Integer sizeHeader=new parse().headerDynamic(ISOUtil.hex2byte(respStr),"000000859822");
+                            ISOMsg resp=  new parse().parsers(respStr.substring(sizeHeader));
+
+                            String req_messID=request.getString(7)+request.getString(11);
+                            String resp_messID=resp.getString(7)+resp.getString(11);
+
+                            out.println("mess 1 "+req_messID+" mess 2 "+resp_messID);
+
+                            if(req_messID.equals(resp_messID)){
+
+                                out.println("getMess");
+                                return redData;
+                            }
+
                         }
 
                     }
 
 
-                    return redData;
                 }
 
 
@@ -105,52 +119,6 @@ public class ConnectTest implements Runnable {
         return redData;
     }
 
-
-    public Socket connectToMux() {
-
-
-        ServerSocket server = null;
-        Socket connect = new Socket();
-        try {
-            server = new ServerSocket(3111);
-            connect = server.accept();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        return connect;
-
-        // get resp cut header
-
-    }
-
-    public byte[] sendToMux(Socket conn, byte[] byteMess) throws IOException {
-
-        DataOutputStream out;
-        BufferedReader reader;
-        DataInputStream in;
-        String resp = "";
-
-        byte[] inmess = new byte[0];
-
-
-        if (conn.isConnected()) {
-            out = new DataOutputStream(new DataOutputStream(conn.getOutputStream()));
-            in = new DataInputStream(new DataInputStream(conn.getInputStream()));
-            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            //send mess
-            out.write(byteMess);
-            resp = reader.readLine();
-        }
-
-        // reader.readLine();
-
-
-        return resp.getBytes();
-    }
 
 
 }
