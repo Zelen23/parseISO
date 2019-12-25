@@ -2,11 +2,11 @@ package com.mycompany.iso8583;
 
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
+import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import static java.lang.System.*;
 
 public class ConnectTest implements Runnable {
 
@@ -18,7 +18,7 @@ public class ConnectTest implements Runnable {
     }
 
     private Socket connect;
-
+    org.slf4j.Logger logger = LoggerFactory.getLogger(ConnectTest.class.getName());
 
     @Override
     public void run() {
@@ -65,28 +65,27 @@ public class ConnectTest implements Runnable {
                     while ((red = inp.read(buffer)) > -1) {
 
                         if (ISOUtil.hexString(buffer).lastIndexOf(
-                                config.getParams("header.const"))==-1) {
-                                        out.println("echo "+ISOUtil.hexString(buffer).substring(0,red));
+                            config.getParams("header.const"))==-1) {
+                            logger.info("echo "+ISOUtil.hexString(buffer).substring(0,red));
                         } else {
                             redData = new byte[red];
                             System.arraycopy(buffer, 0, redData, 0, red);
                             String respStr  = ISOUtil.hexString(redData);
-                                        System.out.println("Data From Mux :" +respStr);
+                            logger.info("Data From Mux :" +respStr);
 
                             ISOMsg request= new parse().parsers(ISOUtil.hexString(byteMess).substring(52));
 
                             Integer sizeHeader=new parse().headerDynamic(ISOUtil.hex2byte(respStr));
                             ISOMsg resp=  new parse().parsers(respStr.substring(sizeHeader));
 
-                            String req_messID=request.getString(7)+request.getString(11);
-                            String resp_messID=resp.getString(7)+resp.getString(11);
+                            String req_messID=createMessID(request);
+                            String resp_messID=createMessID(resp);
 
-                                        out.println("mess 1 "+req_messID+" mess 2 "+resp_messID);
+                            logger.info("mess req "+req_messID+" mess resp "+resp_messID);
 
                             if(req_messID.equals(resp_messID)){
-
-                                        out.println("getMess");
-                                return redData;
+                            logger.info("getMess");
+                             return redData;
                             }
 
                         }
@@ -106,6 +105,9 @@ public class ConnectTest implements Runnable {
         return null;
     }
 
+    private String createMessID(ISOMsg isoMsg){
+        return isoMsg.getString(7)+isoMsg.getString(11);
+    }
 
 
 }

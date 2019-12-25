@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jpos.iso.*;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,6 +28,8 @@ import org.jpos.iso.*;
 public class parse {
 
     ConfigFile config=new ConfigFile();
+    org.slf4j.Logger logger = LoggerFactory.getLogger(parse.class);
+
 
     public byte[] updateRawMess(byte[] raw, String de011) {
         // отхерачит 52 символа
@@ -53,7 +56,7 @@ public class parse {
 
             byte[] data = msg.pack();
             String message = ISOUtil.hexString(data);
-            System.out.println("updateRawMess " + header_echo + message);
+            logger.info("updateRawMess " + header_echo + message);
 
             updr = ISOUtil.hex2byte(header_echo + message);
 
@@ -118,7 +121,7 @@ public class parse {
 
         String[] x = ISOUtil.hexString(rawMess).split(splitter);
         Integer size=x[0].length()+splitter.length()+22;
-        System.out.println("HeaderSize "+size);
+        logger.info("HeaderSize "+size);
 
         return size;
 
@@ -217,8 +220,6 @@ public class parse {
         return value;
     }
 
-
-
     public ISOMsg parsers(String message) {
         ISOMsg msg = new ISOMsg();
         try {
@@ -230,7 +231,7 @@ public class parse {
             for (int i = 1; i <= msg.getMaxField(); i++) {
                 if (msg.hasField(i)) {
                     cat = cat + "|" + msg.getString(i);
-                    System.out.println("    Field-" + i + " : " + msg.getString(i));
+                    logger.info("    Field-" + i + " : " + msg.getString(i));
                 }
 
             }

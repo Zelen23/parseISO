@@ -2,13 +2,16 @@ package rest;
 
 
 import com.mycompany.iso8583.ConnectTest;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.IOException;
 import java.net.Socket;
 
 @SpringBootApplication
 public class Application {
+    org.slf4j.Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static ConnectTest getConnect() {
         return connect;
@@ -27,10 +30,10 @@ public class Application {
     public byte[] sendMess(byte[]mess){
          Socket conn=connect.getConnect();
          if(conn.isConnected()){
-             System.out.println("started");
+             logger.info("started");
              return connect.checkecho(conn,mess);
          }else{
-             System.out.println("disconnect");
+             logger.info("disconnect");
              return null;
 
          }

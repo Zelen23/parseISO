@@ -3,6 +3,7 @@ package rest;
 
 import com.mycompany.iso8583.ConfigFile;
 import org.jpos.iso.ISOUtil;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
 
@@ -19,6 +20,8 @@ public class sendMessController {
     private static final String ERROR_STATUS = "error";
     private static final int CODE_SUCCESS = 100;
     private static final int AUTH_FAILURE = 102;
+
+    org.slf4j.Logger logger = LoggerFactory.getLogger(sendMessController.class);
 
 
     @GetMapping
@@ -40,7 +43,8 @@ public class sendMessController {
                 byte[] d=new parse().updateRawMess(c,de011);
                 respMux= new Application().sendMess(d);
 
-                System.out.println("getResp "+ISOUtil.hexString(respMux));
+                logger.info("getResp "+ISOUtil.hexString(respMux));
+
             }
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
 
@@ -89,7 +93,7 @@ public class sendMessController {
             byte[] c = ISOUtil.hex2byte(rawRequest);
             respMux= new Application().sendMess(c);
 
-                    System.out.println(rawRequest);
+            logger.info(rawRequest);
         }
         if(respMux.length>1){
             HashMap<String, Object> list =new HashMap<String, Object>();
