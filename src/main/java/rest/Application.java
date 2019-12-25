@@ -30,7 +30,7 @@ public class Application {
         SpringApplication application = new SpringApplication(Application.class);
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream("src/application.properties"));
+            properties.load(new FileInputStream("application.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
