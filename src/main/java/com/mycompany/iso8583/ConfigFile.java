@@ -1,7 +1,7 @@
 package com.mycompany.iso8583;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,7 +11,7 @@ public class ConfigFile {
 
     FileInputStream fis;
     Properties property = new Properties();
-    org.slf4j.Logger logger = LoggerFactory.getLogger(ConfigFile.class);
+    Logger logger = LoggerFactory.getLogger(ConfigFile.class);
 
     public String getParams(String strParam){
         String param = "";

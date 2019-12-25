@@ -4,22 +4,17 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
         </Console>
-        <RollingFile name="Simuator" fileName="logs/app.log">
+        <File name="MyFile" fileName="app.log">
             <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] %L - %m%n</Pattern>
             </PatternLayout>
-            <Policies>
-                <TimeBasedTriggeringPolicy interval = "1" />
-                <SizeBasedTriggeringPolicy
-                        size="250 MB" />
-            </Policies>
-        </RollingFile>
+        </File>
     </Appenders>
 
     <Loggers>
         <Root level="info">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="Simuator"/>
+            <AppenderRef ref="MyFile"/>
         </Root>
     </Loggers>
 </Configuration>

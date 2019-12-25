@@ -2,6 +2,7 @@ package com.mycompany.iso8583;
 
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.ServerSocket;
@@ -12,13 +13,12 @@ public class ConnectTest implements Runnable {
 
     ConfigFile config=new ConfigFile();
 
-
     public Socket getConnect() {
         return connect;
     }
 
     private Socket connect;
-    org.slf4j.Logger logger = LoggerFactory.getLogger(ConnectTest.class.getName());
+    Logger logger = LoggerFactory.getLogger(ConnectTest.class);
 
     @Override
     public void run() {
