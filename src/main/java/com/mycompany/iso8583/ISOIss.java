@@ -72,7 +72,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_HEX     (  3, "CURRENCY CODE, CARDHOLDER BILLING" ,true  ),
             new IFB_BINARY  (  8, "PIN DATA"   ),
 /*53*/      new IFB_NUMERIC ( 16, "SECURITY RELATED CONTROL INFORMATION",true),    
-            new IFE_CHAR (120, "ADDITIONAL AMOUNTS"),
+            new IFB_LLHECHAR (120, "ADDITIONAL AMOUNTS"),
 /*add55*/   new IFB_LLHBINARY (255, "INTEGRATED CIRCUIT CARD (ICC)-RELATED DATA"),
             new IFE_CHAR (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED ISO"),
