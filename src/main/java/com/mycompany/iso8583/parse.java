@@ -201,6 +201,8 @@ public class parse {
         String de007 = sdf.format(new Date());
         SimpleDateFormat sdf2 = new SimpleDateFormat("HHmmss");
         String de012 = sdf2.format(new Date());
+        SimpleDateFormat sdf3 = new SimpleDateFormat("MMdd");
+        String de013 = sdf3.format(new Date());
         switch (fieldNumber) {
 
             case 7:
@@ -212,9 +214,13 @@ public class parse {
             case 12:
                 value = de012;
                 break;
+            case 13:
+                value = de013;
+                break;
             case 37:
                 value = "934715000927";
                 break;
+
 
         }
         return value;

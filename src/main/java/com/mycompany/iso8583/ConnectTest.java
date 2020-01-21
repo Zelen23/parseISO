@@ -32,14 +32,15 @@ public class ConnectTest implements Runnable {
             e.printStackTrace();
         }
 
-        // while (true) {
+         while (true) {
         try {
+
             connect = server.accept();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //  }
+          }
 
     }
 
