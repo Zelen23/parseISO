@@ -6,30 +6,11 @@
 package com.mycompany.iso8583;
 
 
-import org.jpos.iso.IFB_AMOUNT;
-import org.jpos.iso.IFB_BINARY;
-import org.jpos.iso.IFB_BITMAP;
-
-import org.jpos.iso.IFB_HEX;
-
-import org.jpos.iso.IFB_LLCHAR;
-import org.jpos.iso.IFB_LLHBINARY;
-
-import org.jpos.iso.IFB_LLHECHAR;
-
-import org.jpos.iso.IFB_LLHNUM;
-
-import org.jpos.iso.IFB_LLLCHAR;
-
-import org.jpos.iso.IFB_LLNUM;
-import org.jpos.iso.IFB_NUMERIC;
-
-import org.jpos.iso.IFE_CHAR;
-
-import org.jpos.iso.IF_CHAR;
-
-import org.jpos.iso.ISOBasePackager;
-import org.jpos.iso.ISOFieldPackager;
+import org.jpos.iso.*;
+import org.jpos.iso.packager.Base1Packager;
+import org.jpos.iso.packager.Base1SubFieldPackager;
+import org.jpos.iso.packager.Base1_BITMAP126;
+import org.jpos.iso.packager.GenericTaggedFieldsPackager;
 
 /**
  *
@@ -39,7 +20,7 @@ public class ISOIss  extends ISOBasePackager{
         private static final boolean pad = false;
     protected ISOFieldPackager fld[] = {
             new IFB_NUMERIC (  4, "MESSAGE TYPE INDICATOR",true),
-            new IFB_BITMAP  ( 16, "BIT MAP"),
+            new IFB_BITMAP  ( 32, "BIT MAP"),
             new IFB_LLHNUM   ( 19, "PAN - PRIMARY ACCOUNT NUMBER",pad),
             new IFB_NUMERIC (  6, "PROCESSING CODE", true),
             new IFB_NUMERIC ( 12, "AMOUNT, TRANSACTION", true),
@@ -83,7 +64,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFE_CHAR     ( 15, "CARD ACCEPTOR IDENTIFICATION CODE" ),
             new IFE_CHAR     ( 40, "CARD ACCEPTOR NAME/LOCATION"),
 /*44ANS V*/ new IFB_LLHECHAR  ( 25, "ADITIONAL RESPONSE DATA"),
-            new IFE_CHAR  ( 76, "TRACK 1 DATA"),
+            new IFB_LLHECHAR  ( 76, "TRACK 1 DATA"),
             new IFE_CHAR (1, "ADITIONAL DATA - ISO"),
             new IFE_CHAR (1, "ADITIONAL DATA - NATIONAL"),
             new IFB_LLHECHAR (255, "ADITIONAL DATA - PRIVATE"),
@@ -92,12 +73,12 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_HEX     (  3, "CURRENCY CODE, CARDHOLDER BILLING" ,true  ),
             new IFB_BINARY  (  8, "PIN DATA"   ),
 /*53*/      new IFB_NUMERIC ( 16, "SECURITY RELATED CONTROL INFORMATION",true),    
-            new IFE_CHAR (120, "ADDITIONAL AMOUNTS"),
+            new IFB_LLHECHAR (120, "ADDITIONAL AMOUNTS"),
 /*add55*/   new IFB_LLHBINARY (255, "INTEGRATED CIRCUIT CARD (ICC)-RELATED DATA"),
-            new IFE_CHAR (255, "RESERVED ISO"),
+/*add56*/   new IFB_LLHBINARY (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED NATIONAL"),
-  /*59*/    new IFE_CHAR (255, "RESERVED NATIONAL"),
+  /*59*/    new IFB_LLHBINARY (255, "RESERVED NATIONAL"),
   /*add 60*/new IFB_LLHBINARY (12, "NATIONAL POINT-OF-SERVICE GEOGRAPHIC DATA"),
    /*add61*/new IFB_LLHBINARY (24, "ADDITIONAL POS INFORMATION"),
             new IFB_LLHBINARY (36, "RESERVED NATIONAL"),
@@ -128,12 +109,12 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_NUMERIC ( 16, "CREDITS, REVERSAL AMOUNT", true),
             new IFB_NUMERIC ( 16, "DEBITS, AMOUNT", true),
             new IFB_NUMERIC ( 16, "DEBITS, REVERSAL AMOUNT", true),
-            new IFB_NUMERIC ( 42, "ORIGINAL DATA ELEMENTS", true),
+     /*90*/ new IFB_NUMERIC ( 42, "ORIGINAL DATA ELEMENTS", true),
             new IF_CHAR     (  1, "FILE UPDATE CODE"),
             new IF_CHAR     (  2, "FILE SECURITY CODE"),
             new IF_CHAR     (  6, "RESPONSE INDICATOR"),
             new IF_CHAR     (  7, "SERVICE INDICATOR"),
-            new IF_CHAR     ( 42, "REPLACEMENT AMOUNTS"),
+     /*95*/ new IFE_CHAR     ( 42, "REPLACEMENT AMOUNTS"),
             new IFB_BINARY  ( 16, "MESSAGE SECURITY CODE"),
             new IFB_AMOUNT  ( 17, "AMOUNT, NET SETTLEMENT", pad),
             new IF_CHAR     ( 25, "PAYEE"),
@@ -142,7 +123,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLCHAR  ( 17, "FILE NAME"),
             new IFB_LLCHAR  ( 28, "ACCOUNT IDENTIFICATION 1"),
             new IFB_LLCHAR  ( 28, "ACCOUNT IDENTIFICATION 2"),
-            new IFB_LLLCHAR (100, "TRANSACTION DESCRIPTION"),
+   /*104*/  new IFB_LLHBINARY (255, "TRANSACTION DESCRIPTION"),
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
@@ -161,18 +142,16 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
+    /*123*/ new IFB_LLHBINARY (255, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-            new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-            new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
+     /*126*///new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
+            new ISOMsgFieldPackager(
+                    new IFB_LLHBINARY (255, "Field 126"),
+                    new F126Packager()),
+
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_BINARY  (  8, "MAC 2")
-    
-            
-
-    
-
-            
 
         };
 
@@ -180,6 +159,50 @@ public class ISOIss  extends ISOBasePackager{
         super();
         setFieldPackager(fld);
     }
-    
-    
+
+
+
+    protected static class F126Packager extends Base1SubFieldPackager
+    {
+        protected ISOFieldPackager fld126[] =
+                {
+                        new Base1_BITMAP126(16, "Bit Map"),
+                        new IFE_CHAR     (25, "Customer Name"),
+                        new IFE_CHAR     (57, "Customer Address"),
+                        new IFE_CHAR     (57, "Biller Address"),
+                        new IFE_CHAR     (18, "Biller Telephone Number"),
+                        new IFE_CHAR     (6,  "Process By Date"),
+                        new IFB_LLNUM    (17, "Cardholder Cert Serial Number", true),
+                        new IFB_LLNUM    (17, "Merchant Cert Serial Number", true),
+                        new IFB_NUMERIC  (40, "Transaction ID", true),
+                        new IFB_NUMERIC  (40, "TransStain", true),
+                        new IFE_CHAR     (6,  "CVV2 Request Data"),
+                };
+
+        protected F126Packager ()
+        {
+            super();
+            setFieldPackager(fld126);
+        }
+    }
+
+    protected static class F127Packager extends ISOBasePackager
+    {
+        protected ISOFieldPackager fld127[] =
+                {
+                        new IFE_CHAR    (1,   "FILE UPDATE COD"),
+                        new IFB_LLHNUM  (19,  "ACCOUNT NUMBER", true),
+                        new IFB_NUMERIC (4,   "PURGE DATE", true),
+                        new IFE_CHAR    (2,   "ACTION CODE"),
+                        new IFE_CHAR    (9,   "REGION CODING"),
+                        new IFB_NUMERIC (4,   "FILLER", true),
+                };
+        protected F127Packager ()
+        {
+            super();
+            setFieldPackager(fld127);
+        }
+    }
+
+
 }
