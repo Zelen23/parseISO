@@ -52,7 +52,7 @@ public class sendMessController {
 
             Integer sizeHeader=new parse().headerDynamic(respMux);
             String body=ISOUtil.hexString(respMux).substring(sizeHeader);
-            list=new parse().parseToArray(body);
+            list=new parse().parseToArray(body,false);
             }else{
             list.put("1", respMux);
         }
@@ -62,17 +62,20 @@ public class sendMessController {
     }
 
     @PostMapping("/rawdecode")
-    public  Response send_r(@RequestParam(value = "mess") String mess,@RequestBody Request request){
+    public  Response send_r(@RequestParam(value = "mess") String mess,@RequestParam  (defaultValue = "raw") String mode,@RequestBody Request request){
         Response response;
 
         String raw=request.getRawMessage();
         if(raw!=""){
-
             byte[] c = ISOUtil.hex2byte(raw);
             String pars=ISOUtil.hexString(c);
             Integer size=new parse().headerDynamic(c);
+            Boolean detalmode=false;
+            if("detal".equals(mode)){
+                detalmode=true;
+            }
 
-            HashMap<String, Object> list =new parse().parseToArray(pars.substring(size));
+            HashMap<String, Object> list =new parse().parseToArray(pars.substring(size),detalmode);
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS,list);
         }else{
             response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
@@ -99,7 +102,7 @@ public class sendMessController {
             HashMap<String, Object> list =new HashMap<String, Object>();
             Integer sizeHeader=new parse().headerDynamic(respMux);
             HashMap<String, Object> resp = new parse()
-                    .parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader));
+                    .parseToArray(ISOUtil.hexString(respMux).substring(sizeHeader),false);
             list.put("rawRequest",rawRequest);
             list.put("data",resp);
 

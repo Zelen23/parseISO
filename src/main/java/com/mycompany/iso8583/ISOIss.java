@@ -10,6 +10,7 @@ import org.jpos.iso.*;
 import org.jpos.iso.packager.Base1Packager;
 import org.jpos.iso.packager.Base1SubFieldPackager;
 import org.jpos.iso.packager.Base1_BITMAP126;
+import org.jpos.iso.packager.GenericTaggedFieldsPackager;
 
 /**
  *
@@ -74,10 +75,10 @@ public class ISOIss  extends ISOBasePackager{
 /*53*/      new IFB_NUMERIC ( 16, "SECURITY RELATED CONTROL INFORMATION",true),    
             new IFB_LLHECHAR (120, "ADDITIONAL AMOUNTS"),
 /*add55*/   new IFB_LLHBINARY (255, "INTEGRATED CIRCUIT CARD (ICC)-RELATED DATA"),
-            new IFE_CHAR (255, "RESERVED ISO"),
+/*add56*/   new IFB_LLHBINARY (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED ISO"),
             new IFE_CHAR (255, "RESERVED NATIONAL"),
-  /*59*/    new IFE_CHAR (255, "RESERVED NATIONAL"),
+  /*59*/    new IFB_LLHBINARY (255, "RESERVED NATIONAL"),
   /*add 60*/new IFB_LLHBINARY (12, "NATIONAL POINT-OF-SERVICE GEOGRAPHIC DATA"),
    /*add61*/new IFB_LLHBINARY (24, "ADDITIONAL POS INFORMATION"),
             new IFB_LLHBINARY (36, "RESERVED NATIONAL"),
@@ -141,7 +142,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-            new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
+    /*123*/ new IFB_LLHBINARY (255, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
      /*126*///new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
@@ -151,12 +152,6 @@ public class ISOIss  extends ISOBasePackager{
 
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
             new IFB_BINARY  (  8, "MAC 2")
-    
-            
-
-    
-
-            
 
         };
 

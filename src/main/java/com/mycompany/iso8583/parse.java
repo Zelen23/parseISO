@@ -5,7 +5,7 @@
  */
 package com.mycompany.iso8583;
 
-
+//https://neapay.com/online-tools/emv-tlv-decoder.html
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,8 +16,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jpos.emv.EMVStandardTagType;
 import org.jpos.iso.*;
+import org.jpos.tlv.TLVList;
+import org.jpos.tlv.TLVMsg;
 import org.slf4j.LoggerFactory;
+
+import static org.jpos.emv.EMVStandardTagType.TERMINAL_CAPABILITIES_0x9F33;
 
 
 /**
@@ -68,7 +73,7 @@ public class parse {
         return updr;
     }
 
-    public HashMap<String, Object> parseToArray(String rawMessage) {
+    public HashMap<String, Object> parseToArray(String rawMessage,Boolean detalmode) {
 
         HashMap<String, Object> list = new LinkedHashMap<String, Object>();
         ISOMsg msg = new ISOMsg();
@@ -91,7 +96,6 @@ public class parse {
                         HashMap<String, String> f126 = new HashMap<>();
                         ISOMsg subIso = new ISOMsg();
                         subIso.setPackager(pp);
-
                         subIso.unpack(comp.pack());
                         for (int j = 1; j <= subIso.getMaxField(); j++) {
 
@@ -99,9 +103,28 @@ public class parse {
                                 f126.put("" + j, subIso.getString(j));
                             }
                         }
-
                         list.put("de" + String.format("%03d", i), f126);
+                    }
+                    if(i==104){
+                        TLVList tlvData = new TLVList();
 
+                        String fff = msg.getString(i);
+                        //tlvData.unpack(ISOUtil.hex2byte(fff));
+                    }
+                    if(i==55){
+                        byte[] fld = msg.getBytes(55);
+                        byte[] fld2 =Arrays.copyOfRange( fld,  3, fld.length);
+                        TLVList tlvData = new TLVList();
+                        tlvData.unpack(fld2);
+                        HashMap<String,String> f55=new HashMap<>();
+                        for (TLVMsg tLVMsg : tlvData.getTags()) {
+                            f55.put( Integer.toHexString(tLVMsg.getTag()),ISOUtil.hexString(tLVMsg.getValue()));
+                        }
+                        if(detalmode){
+                            list.put("de" + String.format("%03d", i), f55);
+                        }else{
+                            list.put("de" + String.format("%03d", i),msg.getString(i));
+                        }
 
                     }
                 }
@@ -197,6 +220,7 @@ public class parse {
 
     public String autogenerate(Integer fieldNumber) {
         String value = "";
+        String val1= config.getParams("val1");
         SimpleDateFormat sdf = new SimpleDateFormat("MMddHHmmss");
         String de007 = sdf.format(new Date());
         SimpleDateFormat sdf2 = new SimpleDateFormat("HHmmss");
@@ -208,6 +232,9 @@ public class parse {
             case 7:
                 value = de007;
                 break;
+            case 10:
+                value = de013.substring(1)+val1;
+                break;
             case 11:
                 value = "000927";
                 break;
@@ -215,6 +242,9 @@ public class parse {
                 value = de012;
                 break;
             case 13:
+                value = de013;
+                break;
+            case 15:
                 value = de013;
                 break;
             case 37:

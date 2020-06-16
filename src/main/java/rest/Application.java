@@ -22,7 +22,7 @@ public class Application {
         return connect;
     }
 
-     public  static ConnectTest connect;
+    public  static ConnectTest connect;
 
     public static void main(String[] args) throws InterruptedException {
 
