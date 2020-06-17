@@ -220,26 +220,18 @@ public class parse {
 
         ISOMsg msg55=new ISOMsg(55);
         TLVList tlvData = new TLVList();
-        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
-        tlvData.append(0x9A,ISOUtil.hex2byte("190919"));
-        tlvData.append(0x9F37,ISOUtil.hex2byte("9BADBCAB"));
-        tlvData.append(0x9F26,ISOUtil.hex2byte("9C9D5C389366C0E8"));
-        tlvData.append(0x9C,ISOUtil.hex2byte("70"));
-        tlvData.append(0x9F36,ISOUtil.hex2byte("00FF"));
-        tlvData.append(0x9F03,ISOUtil.hex2byte("000000000000"));
-        tlvData.append(0xC0,ISOUtil.hex2byte("C290FE4F74552A77"));
-        tlvData.append(0x9F02,ISOUtil.hex2byte("000000012300"));
-        tlvData.append(0x9F33,ISOUtil.hex2byte("204000"));
-        tlvData.append(0x9F10,ISOUtil.hex2byte("06010A03A0B000"));
-        tlvData.append(0x5f2A,ISOUtil.hex2byte("0978"));
-        tlvData.append(0x82,ISOUtil.hex2byte("0000"));
-        tlvData.append(0x95,ISOUtil.hex2byte("8000010000"));
-        tlvData.append(0x84,ISOUtil.hex2byte("A0000000031010"));
+        for (Map.Entry<String, Object> obj : tlv.entrySet()){
+             Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+        }
+
+/*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
+*/
 
         byte[] flfpack = tlvData.pack();
-        String hex55="010069"+ISOUtil.hexString(flfpack);
-        System.out.println("pack55^ "+hex55);
-        return hex55;
+        String hex55=ISOUtil.hexString(flfpack);
+        String hexSize=String.format("%04X", hex55.length()/2);
+        return "01"+hexSize+hex55;
     }
     public ISOMsg packMSG126(Map<String, Object> obj) {
 
