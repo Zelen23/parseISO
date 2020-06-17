@@ -149,6 +149,7 @@ public class parse {
         return size;
 
     }
+
     public String createMess(HashMap<String, Object> mess) {
         //приходит json
         // считаю поля
@@ -168,31 +169,38 @@ public class parse {
                 }
             } else {
                 int key = parseKey(obj.getKey());
+
                 if (obj.getValue().toString().equals("*")) {
                     msg.set(key, autogenerate(key));
                 } else {
 
-                    if (key == 126) {
+                    switch (key){
+                        case 126:
+                            HashMap<String, Object> subf= (HashMap<String, Object>) obj.getValue();
+                            try {
+                                msg.set(packMSG126(subf));
 
-                        HashMap<String, Object> subf= (HashMap<String, Object>) obj.getValue();
-
-                        try {
-
-                            msg.set(packMSG126(subf));
-
-                        } catch (ISOException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        msg.set(key, obj.getValue().toString());
+                            } catch (ISOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case 55:
+                            HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
+                            try {
+                                msg.set(packMSG55(tlv));
+                            } catch (ISOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        default:
+                            msg.set(key, obj.getValue().toString());
                     }
+
                 }
 
             }
 
         }
-
 
         try {
             packbody = msg.pack();
@@ -209,6 +217,32 @@ public class parse {
 
 
         return header + ISOUtil.hexString(packbody);
+    }
+    private ISOMsg packMSG55(HashMap<String, Object> tlv) {
+
+        ISOMsg msg55=new ISOMsg(55);
+        TLVList tlvData = new TLVList();
+        for (Map.Entry<String, Object> obj : tlv.entrySet()) {
+
+        }
+        return msg55;
+    }
+    public ISOMsg packMSG126(Map<String, Object> obj) {
+
+        ISOMsg msg126 = new ISOMsg(126);
+        for (Map.Entry<String, Object> obj2 : obj.entrySet()) {
+
+            ISOField subfld = new ISOField(Integer.parseInt(obj2.getKey()), obj2.getValue().toString());
+            try {
+                msg126.set(subfld);
+
+            } catch (ISOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return msg126;
     }
 
     public Integer parseKey(String keyFromHashMap) {
@@ -365,6 +399,9 @@ public class parse {
         return data;
     }
 
+
+
+
     public static byte[] createEcho810(ISOMsg isoMsg) {
         byte[] data = null;
         String header_echo = "0036000016010200361111112222220000000000000000000001";
@@ -387,8 +424,6 @@ public class parse {
 
         return data;
     }
-
-
     public static void server() {
         DataInputStream in;
         DataOutputStream out;
@@ -495,23 +530,6 @@ Received de090:012000000000000000001234567890100000000000*/
             e.printStackTrace();
         }
 
-    }
-    public ISOMsg packMSG126(Map<String, Object> obj) {
-
-        ISOMsg msg126 = new ISOMsg(126);
-        for (Map.Entry<String, Object> obj2 : obj.entrySet()) {
-
-            ISOField subfld = new ISOField(Integer.parseInt(obj2.getKey()), obj2.getValue().toString());
-            try {
-                msg126.set(subfld);
-
-            } catch (ISOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        return msg126;
     }
     public ISOMsg pack2() {
         ISOMsg msg = new ISOMsg();

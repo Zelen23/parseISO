@@ -94,7 +94,7 @@ public class sendMessController {
         if(!jsondata.isEmpty()) {
             rawRequest= new parse().createMess(jsondata);
             byte[] c = ISOUtil.hex2byte(rawRequest);
-            respMux= new Application().sendMess(c);
+            //respMux= new Application().sendMess(c);
 
             logger.info(rawRequest);
         }
