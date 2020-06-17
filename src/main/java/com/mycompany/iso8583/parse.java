@@ -151,8 +151,7 @@ public class parse {
         return size;
 
     }
-
-    public String createMess(HashMap<String, Object> mess) {
+    public  String createMess(HashMap<String, Object> mess) {
         //приходит json
         // считаю поля
         // создаю ISO mess  в цикле значение добавляю в mess  если значение * то поздаю по  наблоизатору
@@ -187,9 +186,13 @@ public class parse {
                             }
                             break;
                         case 55:
-                            HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
                                 msg.set(55,packMSG55(tlv));
-                            break;
+                                break;
+                            }
+
                         default:
                             msg.set(key, obj.getValue().toString());
                     }
@@ -250,14 +253,12 @@ public class parse {
 
         return msg126;
     }
-
     public Integer parseKey(String keyFromHashMap) {
 
         Integer key = Integer.parseInt(keyFromHashMap.split("de")[1]);
 
         return key;
     }
-
     public String autogenerate(Integer fieldNumber) {
         String value = "";
         String val1= config.getParams("val1");
@@ -295,7 +296,6 @@ public class parse {
         }
         return value;
     }
-
     public ISOMsg parsers(String message) {
         ISOMsg msg = new ISOMsg();
         try {
@@ -317,7 +317,6 @@ public class parse {
 
         return msg;
     }
-
     public static byte[] packmessSmoll() {
 
         String message = "";
@@ -375,7 +374,6 @@ public class parse {
 
 
     }
-
     public static byte[] createEcho() {
         byte[] data = null;
         String header_echo = "0036000016010200361111112222220000000000000000000001";
