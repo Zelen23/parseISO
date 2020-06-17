@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import java.text.SimpleDateFormat;
+import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,6 +116,7 @@ public class parse {
                         byte[] fld = msg.getBytes(55);
                         byte[] fld2 =Arrays.copyOfRange( fld,  3, fld.length);
                         TLVList tlvData = new TLVList();
+
                         tlvData.unpack(fld2);
                         HashMap<String,String> f55=new HashMap<>();
                         for (TLVMsg tLVMsg : tlvData.getTags()) {
@@ -186,11 +188,7 @@ public class parse {
                             break;
                         case 55:
                             HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
-                            try {
-                                msg.set(packMSG55(tlv));
-                            } catch (ISOException e) {
-                                e.printStackTrace();
-                            }
+                                msg.set(55,packMSG55(tlv));
                             break;
                         default:
                             msg.set(key, obj.getValue().toString());
@@ -218,14 +216,30 @@ public class parse {
 
         return header + ISOUtil.hexString(packbody);
     }
-    private ISOMsg packMSG55(HashMap<String, Object> tlv) {
+    private String packMSG55(HashMap<String, Object> tlv) {
 
         ISOMsg msg55=new ISOMsg(55);
         TLVList tlvData = new TLVList();
-        for (Map.Entry<String, Object> obj : tlv.entrySet()) {
+        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
+        tlvData.append(0x9A,ISOUtil.hex2byte("190919"));
+        tlvData.append(0x9F37,ISOUtil.hex2byte("9BADBCAB"));
+        tlvData.append(0x9F26,ISOUtil.hex2byte("9C9D5C389366C0E8"));
+        tlvData.append(0x9C,ISOUtil.hex2byte("70"));
+        tlvData.append(0x9F36,ISOUtil.hex2byte("00FF"));
+        tlvData.append(0x9F03,ISOUtil.hex2byte("000000000000"));
+        tlvData.append(0xC0,ISOUtil.hex2byte("C290FE4F74552A77"));
+        tlvData.append(0x9F02,ISOUtil.hex2byte("000000012300"));
+        tlvData.append(0x9F33,ISOUtil.hex2byte("204000"));
+        tlvData.append(0x9F10,ISOUtil.hex2byte("06010A03A0B000"));
+        tlvData.append(0x5f2A,ISOUtil.hex2byte("0978"));
+        tlvData.append(0x82,ISOUtil.hex2byte("0000"));
+        tlvData.append(0x95,ISOUtil.hex2byte("8000010000"));
+        tlvData.append(0x84,ISOUtil.hex2byte("A0000000031010"));
 
-        }
-        return msg55;
+        byte[] flfpack = tlvData.pack();
+        String hex55="010069"+ISOUtil.hexString(flfpack);
+        System.out.println("pack55^ "+hex55);
+        return hex55;
     }
     public ISOMsg packMSG126(Map<String, Object> obj) {
 
