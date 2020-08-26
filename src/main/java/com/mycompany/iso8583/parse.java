@@ -12,18 +12,14 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 import java.text.SimpleDateFormat;
-import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jpos.emv.EMVStandardTagType;
 import org.jpos.iso.*;
 import org.jpos.tlv.TLVList;
 import org.jpos.tlv.TLVMsg;
 import org.slf4j.LoggerFactory;
-
-import static org.jpos.emv.EMVStandardTagType.TERMINAL_CAPABILITIES_0x9F33;
 
 
 /**
@@ -91,7 +87,6 @@ public class parse {
                 if (msg.hasField(i)) {
                     list.put("de" + String.format("%03d", i), msg.getString(i));
                     if (i == 126) {
-
                         ISOComponent comp = msg.getComponent(126);
                         ISOIss.F126Packager pp = new ISOIss.F126Packager();
                         HashMap<String, String> f126 = new HashMap<>();
@@ -126,6 +121,16 @@ public class parse {
                             list.put("de" + String.format("%03d", i), f55);
                         }else{
                             list.put("de" + String.format("%03d", i),msg.getString(i));
+                        }
+
+                    }
+                    if(i==123){
+                        if(detalmode) {
+
+                            list.put("de" + String.format("%03d", i), split(msg.getString(i)));
+
+                        }else{
+                            list.put("de" + String.format("%03d", i), msg.getString(i));
                         }
 
                     }
@@ -404,7 +409,35 @@ public class parse {
     }
 
 
+    public static HashMap<String, String> split(String tokenData){
+        boolean flag=true;
+        Integer start=0;
+        Integer counter=0;
+        HashMap<String,String> tlvObj = new HashMap<String, String>();
+        do {
+            counter=counter+1;
 
+            String tag=tokenData.substring(start,start+2);
+            int increment=convertaSize(tokenData.substring(start+2,start+6));
+            String tlvListforTag=tokenData.substring(start+6,start+6+increment*2);
+
+            tlvObj.put(tag,tlvListforTag);
+            start=start+4+increment*2+2;
+
+            if(tokenData.length()<=start){
+                flag=false;
+            }
+
+        } while (flag);
+
+        return tlvObj;
+    }
+
+    public static int convertaSize(String hex){
+
+        return Integer.parseInt(hex,16);
+
+    }
 
     public static byte[] createEcho810(ISOMsg isoMsg) {
         byte[] data = null;
