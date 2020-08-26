@@ -209,6 +209,13 @@ public class parse {
                                 msg.set(55,packMSG55(tlv));
                                 break;
                             }
+                        case 123:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(123,packMSG123(tlv));
+                                break;
+                            }
 
                         default:
                             msg.set(key, obj.getValue().toString());
@@ -253,6 +260,32 @@ public class parse {
         String hexSize=String.format("%04X", hex55.length()/2);
         return "01"+hexSize+hex55;
     }
+    private String packMSG123(HashMap<String, HashMap<String, Object>> tlv) {
+        String message="";
+
+        for (Map.Entry<String, HashMap<String, Object>> obj1 : tlv.entrySet()){
+            HashMap<String, Object> item = obj1.getValue();
+
+       TLVList tlvData = new TLVList();
+        for (Map.Entry<String, Object> obj : item.entrySet()){
+            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+        }
+
+            byte[] flfpack = tlvData.pack();
+            String hex123=ISOUtil.hexString(flfpack);
+            String hexSize=String.format("%04X", hex123.length()/2);
+            //return hexSize+hex123;
+
+            message+=obj1.getKey()+hexSize+hex123;
+
+        }
+
+
+        System.out.println(message);
+    return message;
+    }
+
     public ISOMsg packMSG126(Map<String, Object> obj) {
 
         ISOMsg msg126 = new ISOMsg(126);
@@ -444,7 +477,6 @@ public class parse {
 
         return tlvObj;
     }
-
     public static int convertaSize(String hex){
 
         return Integer.parseInt(hex,16);
