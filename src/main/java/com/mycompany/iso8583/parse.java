@@ -126,8 +126,20 @@ public class parse {
                     }
                     if(i==123){
                         if(detalmode) {
+                            HashMap<String,String>tlvObj=split(msg.getString(i));
+                            HashMap<String,HashMap<String,String>> objTLV=new HashMap<>();
 
-                            list.put("de" + String.format("%03d", i), split(msg.getString(i)));
+                            for (String obj:tlvObj.keySet()){
+                                TLVList tlvData = new TLVList();
+
+                                tlvData.unpack(ISOUtil.hex2byte(tlvObj.get(obj)));
+                                HashMap<String,String> f123=new HashMap<>();
+                                for (TLVMsg tLVMsg : tlvData.getTags()) {
+                                    f123.put( Integer.toHexString(tLVMsg.getTag()),ISOUtil.hexString(tLVMsg.getValue()));
+                                }
+                                objTLV.put(obj,f123);
+                            }
+                            list.put("de" + String.format("%03d", i),objTLV);
 
                         }else{
                             list.put("de" + String.format("%03d", i), msg.getString(i));
