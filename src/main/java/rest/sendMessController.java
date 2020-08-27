@@ -92,10 +92,10 @@ public class sendMessController {
         byte []respMux = new byte[0];
         HashMap<String,Object> jsondata=request.getData();
         if(!jsondata.isEmpty()) {
+
             rawRequest= new parse().createMess(jsondata);
             byte[] c = ISOUtil.hex2byte(rawRequest);
             respMux= new Application().sendMess(c);
-
             logger.info(rawRequest);
         }
         if(respMux.length>1){

@@ -16,13 +16,10 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.jpos.emv.EMVStandardTagType;
 import org.jpos.iso.*;
 import org.jpos.tlv.TLVList;
 import org.jpos.tlv.TLVMsg;
 import org.slf4j.LoggerFactory;
-
-import static org.jpos.emv.EMVStandardTagType.TERMINAL_CAPABILITIES_0x9F33;
 
 
 /**
@@ -90,7 +87,6 @@ public class parse {
                 if (msg.hasField(i)) {
                     list.put("de" + String.format("%03d", i), msg.getString(i));
                     if (i == 126) {
-
                         ISOComponent comp = msg.getComponent(126);
                         ISOIss.F126Packager pp = new ISOIss.F126Packager();
                         HashMap<String, String> f126 = new HashMap<>();
@@ -115,6 +111,7 @@ public class parse {
                         byte[] fld = msg.getBytes(55);
                         byte[] fld2 =Arrays.copyOfRange( fld,  3, fld.length);
                         TLVList tlvData = new TLVList();
+
                         tlvData.unpack(fld2);
                         HashMap<String,String> f55=new HashMap<>();
                         for (TLVMsg tLVMsg : tlvData.getTags()) {
@@ -124,6 +121,28 @@ public class parse {
                             list.put("de" + String.format("%03d", i), f55);
                         }else{
                             list.put("de" + String.format("%03d", i),msg.getString(i));
+                        }
+
+                    }
+                    if(i==123){
+                        if(detalmode) {
+                            HashMap<String,String>tlvObj=split(msg.getString(i));
+                            HashMap<String,HashMap<String,String>> objTLV=new HashMap<>();
+
+                            for (String obj:tlvObj.keySet()){
+                                TLVList tlvData = new TLVList();
+
+                                tlvData.unpack(ISOUtil.hex2byte(tlvObj.get(obj)));
+                                HashMap<String,String> f123=new HashMap<>();
+                                for (TLVMsg tLVMsg : tlvData.getTags()) {
+                                    f123.put( Integer.toHexString(tLVMsg.getTag()),ISOUtil.hexString(tLVMsg.getValue()));
+                                }
+                                objTLV.put(obj,f123);
+                            }
+                            list.put("de" + String.format("%03d", i),objTLV);
+
+                        }else{
+                            list.put("de" + String.format("%03d", i), msg.getString(i));
                         }
 
                     }
@@ -149,7 +168,7 @@ public class parse {
         return size;
 
     }
-    public String createMess(HashMap<String, Object> mess) {
+    public  String createMess(HashMap<String, Object> mess) {
         //приходит json
         // считаю поля
         // создаю ISO mess  в цикле значение добавляю в mess  если значение * то поздаю по  наблоизатору
@@ -168,31 +187,45 @@ public class parse {
                 }
             } else {
                 int key = parseKey(obj.getKey());
+
                 if (obj.getValue().toString().equals("*")) {
                     msg.set(key, autogenerate(key));
                 } else {
 
-                    if (key == 126) {
+                    switch (key){
+                        case 126:
+                            HashMap<String, Object> subf= (HashMap<String, Object>) obj.getValue();
+                            try {
+                                msg.set(packMSG126(subf));
 
-                        HashMap<String, Object> subf= (HashMap<String, Object>) obj.getValue();
+                            } catch (ISOException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case 55:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
+                                msg.set(55,packMSG55(tlv));
+                                break;
+                            }
+                        case 123:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(123,packMSG123(tlv));
+                                break;
+                            }
 
-                        try {
-
-                            msg.set(packMSG126(subf));
-
-                        } catch (ISOException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        msg.set(key, obj.getValue().toString());
+                        default:
+                            msg.set(key, obj.getValue().toString());
                     }
+
                 }
 
             }
 
         }
-
 
         try {
             packbody = msg.pack();
@@ -210,14 +243,72 @@ public class parse {
 
         return header + ISOUtil.hexString(packbody);
     }
+    private String packMSG55(HashMap<String, Object> tlv) {
 
+        ISOMsg msg55=new ISOMsg(55);
+        TLVList tlvData = new TLVList();
+        for (Map.Entry<String, Object> obj : tlv.entrySet()){
+             Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+        }
+
+/*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
+*/
+
+        byte[] flfpack = tlvData.pack();
+        String hex55=ISOUtil.hexString(flfpack);
+        String hexSize=String.format("%04X", hex55.length()/2);
+        return "01"+hexSize+hex55;
+    }
+    private String packMSG123(HashMap<String, HashMap<String, Object>> tlv) {
+        String message="";
+
+        for (Map.Entry<String, HashMap<String, Object>> obj1 : tlv.entrySet()){
+            HashMap<String, Object> item = obj1.getValue();
+
+       TLVList tlvData = new TLVList();
+        for (Map.Entry<String, Object> obj : item.entrySet()){
+            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+        }
+
+            byte[] flfpack = tlvData.pack();
+            String hex123=ISOUtil.hexString(flfpack);
+            String hexSize=String.format("%04X", hex123.length()/2);
+            //return hexSize+hex123;
+
+            message+=obj1.getKey()+hexSize+hex123;
+
+        }
+
+
+        System.out.println(message);
+    return message;
+    }
+
+    public ISOMsg packMSG126(Map<String, Object> obj) {
+
+        ISOMsg msg126 = new ISOMsg(126);
+        for (Map.Entry<String, Object> obj2 : obj.entrySet()) {
+
+            ISOField subfld = new ISOField(Integer.parseInt(obj2.getKey()), obj2.getValue().toString());
+            try {
+                msg126.set(subfld);
+
+            } catch (ISOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return msg126;
+    }
     public Integer parseKey(String keyFromHashMap) {
 
         Integer key = Integer.parseInt(keyFromHashMap.split("de")[1]);
 
         return key;
     }
-
     public String autogenerate(Integer fieldNumber) {
         String value = "";
         String val1= config.getParams("val1");
@@ -255,7 +346,6 @@ public class parse {
         }
         return value;
     }
-
     public ISOMsg parsers(String message) {
         ISOMsg msg = new ISOMsg();
         try {
@@ -277,7 +367,6 @@ public class parse {
 
         return msg;
     }
-
     public static byte[] packmessSmoll() {
 
         String message = "";
@@ -335,7 +424,6 @@ public class parse {
 
 
     }
-
     public static byte[] createEcho() {
         byte[] data = null;
         String header_echo = "0036000016010200361111112222220000000000000000000001";
@@ -365,6 +453,36 @@ public class parse {
         return data;
     }
 
+
+    public static HashMap<String, String> split(String tokenData){
+        boolean flag=true;
+        Integer start=0;
+        Integer counter=0;
+        HashMap<String,String> tlvObj = new HashMap<String, String>();
+        do {
+            counter=counter+1;
+
+            String tag=tokenData.substring(start,start+2);
+            int increment=convertaSize(tokenData.substring(start+2,start+6));
+            String tlvListforTag=tokenData.substring(start+6,start+6+increment*2);
+
+            tlvObj.put(tag,tlvListforTag);
+            start=start+4+increment*2+2;
+
+            if(tokenData.length()<=start){
+                flag=false;
+            }
+
+        } while (flag);
+
+        return tlvObj;
+    }
+    public static int convertaSize(String hex){
+
+        return Integer.parseInt(hex,16);
+
+    }
+
     public static byte[] createEcho810(ISOMsg isoMsg) {
         byte[] data = null;
         String header_echo = "0036000016010200361111112222220000000000000000000001";
@@ -387,8 +505,6 @@ public class parse {
 
         return data;
     }
-
-
     public static void server() {
         DataInputStream in;
         DataOutputStream out;
@@ -495,23 +611,6 @@ Received de090:012000000000000000001234567890100000000000*/
             e.printStackTrace();
         }
 
-    }
-    public ISOMsg packMSG126(Map<String, Object> obj) {
-
-        ISOMsg msg126 = new ISOMsg(126);
-        for (Map.Entry<String, Object> obj2 : obj.entrySet()) {
-
-            ISOField subfld = new ISOField(Integer.parseInt(obj2.getKey()), obj2.getValue().toString());
-            try {
-                msg126.set(subfld);
-
-            } catch (ISOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        return msg126;
     }
     public ISOMsg pack2() {
         ISOMsg msg = new ISOMsg();
