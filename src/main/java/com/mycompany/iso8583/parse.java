@@ -243,6 +243,7 @@ public class parse {
 
         return header + ISOUtil.hexString(packbody);
     }
+    //55, 123ref
     private String packMSG55(HashMap<String, Object> tlv) {
 
         ISOMsg msg55=new ISOMsg(55);
@@ -452,7 +453,6 @@ public class parse {
 
         return data;
     }
-
 
     public static HashMap<String, String> split(String tokenData){
         boolean flag=true;
