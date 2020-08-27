@@ -48,7 +48,8 @@ public class Application {
          Socket conn=connect.getConnect();
          if(conn.isConnected()){
              logger.info("started");
-             return connect.checkecho(conn,mess);
+             byte[] resp = connect.checkecho(conn, mess);
+             return resp;
          }else{
              logger.info("disconnect");
              return null;
