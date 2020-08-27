@@ -243,47 +243,32 @@ public class parse {
 
         return header + ISOUtil.hexString(packbody);
     }
-    //55, 123ref
-    private String packMSG55(HashMap<String, Object> tlv) {
 
-        ISOMsg msg55=new ISOMsg(55);
+    private String packTLVFld(HashMap<String, Object> tlv){
+
         TLVList tlvData = new TLVList();
         for (Map.Entry<String, Object> obj : tlv.entrySet()){
-             Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
             tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
         }
-
-/*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
-*/
-
+        /*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
+         */
         byte[] flfpack = tlvData.pack();
         String hex55=ISOUtil.hexString(flfpack);
         String hexSize=String.format("%04X", hex55.length()/2);
-        return "01"+hexSize+hex55;
+        return hexSize+hex55;
+    }
+    private String packMSG55(HashMap<String, Object> tlv) {
+
+        return "01"+packTLVFld(tlv);
     }
     private String packMSG123(HashMap<String, HashMap<String, Object>> tlv) {
         String message="";
 
         for (Map.Entry<String, HashMap<String, Object>> obj1 : tlv.entrySet()){
             HashMap<String, Object> item = obj1.getValue();
-
-       TLVList tlvData = new TLVList();
-        for (Map.Entry<String, Object> obj : item.entrySet()){
-            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
-            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+            message+=obj1.getKey()+packTLVFld(item);
         }
-
-            byte[] flfpack = tlvData.pack();
-            String hex123=ISOUtil.hexString(flfpack);
-            String hexSize=String.format("%04X", hex123.length()/2);
-            //return hexSize+hex123;
-
-            message+=obj1.getKey()+hexSize+hex123;
-
-        }
-
-
-        System.out.println(message);
     return message;
     }
 
