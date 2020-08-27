@@ -26,7 +26,7 @@ public class ConnectTest implements Runnable {
         ServerSocket server = null;
         connect = new Socket();
         try {
-            server = new ServerSocket(config.getIntParams("echo.counter"));
+            server = new ServerSocket(config.getIntParams("connect.port"));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +70,7 @@ public class ConnectTest implements Runnable {
                             config.getParams("header.const"))==-1) {
                             logger.info("echo "+ISOUtil.hexString(buffer).substring(0,red));
                             counter++;
-                            if (counter>=config.getIntParams("count")){
+                            if (counter>=config.getIntParams("echo.counter")){
                                 logger.info("CMS no responsed ");
 
                                 break;
