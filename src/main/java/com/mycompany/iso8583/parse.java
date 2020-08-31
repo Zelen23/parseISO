@@ -10,12 +10,10 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.sun.deploy.nativesandbox.NativeSandboxBroker;
 import org.jpos.iso.*;
 import org.jpos.tlv.TLVList;
 import org.jpos.tlv.TLVMsg;
@@ -103,7 +101,7 @@ public class parse {
                         }
 
                     }
-                    if(i==104|i==123){
+                    if(i==104|i==123|i==56){
                         if(detalmode) {
                             list.put("de" + String.format("%03d", i),
                                     parsingObjectWithTLV(msg.getString(i)));
@@ -204,6 +202,13 @@ public class parse {
                             if(!obj.getValue().getClass().equals(String.class)){
                                 HashMap<String, Object> tlv= (HashMap<String, Object>) obj.getValue();
                                 msg.set(55,packMSG55(tlv));
+                                break;
+                            }
+                        case 56:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(56,packMSG123(tlv));
                                 break;
                             }
                         case 123:
