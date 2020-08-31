@@ -10,12 +10,10 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jpos.iso.*;
 import org.jpos.tlv.TLVList;
 import org.jpos.tlv.TLVMsg;
@@ -86,27 +84,6 @@ public class parse {
             for (int i = 1; i <= msg.getMaxField(); i++) {
                 if (msg.hasField(i)) {
                     list.put("de" + String.format("%03d", i), msg.getString(i));
-                    if (i == 126) {
-                        ISOComponent comp = msg.getComponent(126);
-                        ISOIss.F126Packager pp = new ISOIss.F126Packager();
-                        HashMap<String, String> f126 = new HashMap<>();
-                        ISOMsg subIso = new ISOMsg();
-                        subIso.setPackager(pp);
-                        subIso.unpack(comp.pack());
-                        for (int j = 1; j <= subIso.getMaxField(); j++) {
-
-                            if (subIso.hasField(j)) {
-                                f126.put("" + j, subIso.getString(j));
-                            }
-                        }
-                        list.put("de" + String.format("%03d", i), f126);
-                    }
-                    if(i==104){
-                        TLVList tlvData = new TLVList();
-
-                        String fff = msg.getString(i);
-                        //tlvData.unpack(ISOUtil.hex2byte(fff));
-                    }
                     if(i==55){
                         byte[] fld = msg.getBytes(55);
                         byte[] fld2 =Arrays.copyOfRange( fld,  3, fld.length);
@@ -124,27 +101,29 @@ public class parse {
                         }
 
                     }
-                    if(i==123){
+                    if(i==104|i==123|i==56){
                         if(detalmode) {
-                            HashMap<String,String>tlvObj=split(msg.getString(i));
-                            HashMap<String,HashMap<String,String>> objTLV=new HashMap<>();
-
-                            for (String obj:tlvObj.keySet()){
-                                TLVList tlvData = new TLVList();
-
-                                tlvData.unpack(ISOUtil.hex2byte(tlvObj.get(obj)));
-                                HashMap<String,String> f123=new HashMap<>();
-                                for (TLVMsg tLVMsg : tlvData.getTags()) {
-                                    f123.put( Integer.toHexString(tLVMsg.getTag()),ISOUtil.hexString(tLVMsg.getValue()));
-                                }
-                                objTLV.put(obj,f123);
-                            }
-                            list.put("de" + String.format("%03d", i),objTLV);
+                            list.put("de" + String.format("%03d", i),
+                                    parsingObjectWithTLV(msg.getString(i)));
 
                         }else{
                             list.put("de" + String.format("%03d", i), msg.getString(i));
                         }
+                    }
+                    if(i==126) {
+                        ISOComponent comp = msg.getComponent(126);
+                        ISOIss.F126Packager pp = new ISOIss.F126Packager();
+                        HashMap<String, String> f126 = new HashMap<>();
+                        ISOMsg subIso = new ISOMsg();
+                        subIso.setPackager(pp);
+                        subIso.unpack(comp.pack());
+                        for (int j = 1; j <= subIso.getMaxField(); j++) {
 
+                            if (subIso.hasField(j)) {
+                                f126.put("" + j, subIso.getString(j));
+                            }
+                        }
+                        list.put("de" + String.format("%03d", i), f126);
                     }
                 }
 
@@ -154,8 +133,24 @@ public class parse {
             Logger.getLogger(parse.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
         return list;
+    }
+    public HashMap<String, HashMap<String, String>> parsingObjectWithTLV( String fieldData){
+       
+        HashMap<String,String>tlvObj= splitbyTag(fieldData);
+        HashMap<String,HashMap<String,String>> objTLV=new HashMap<>();
+
+        for (String obj:tlvObj.keySet()){
+            TLVList tlvData = new TLVList();
+
+            tlvData.unpack(ISOUtil.hex2byte(tlvObj.get(obj)));
+            HashMap<String,String> f104=new HashMap<>();
+            for (TLVMsg tLVMsg : tlvData.getTags()) {
+                f104.put( Integer.toHexString(tLVMsg.getTag()),ISOUtil.hexString(tLVMsg.getValue()));
+            }
+            objTLV.put(obj,f104);
+        }
+        return objTLV;
     }
     public Integer headerDynamic(byte[] rawMess) {
 
@@ -209,11 +204,25 @@ public class parse {
                                 msg.set(55,packMSG55(tlv));
                                 break;
                             }
+                        case 56:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(56,packMSG123(tlv));
+                                break;
+                            }
                         case 123:
                             //проверить строка или обьект
                             if(!obj.getValue().getClass().equals(String.class)){
                                 HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
                                 msg.set(123,packMSG123(tlv));
+                                break;
+                            }
+                        case 104:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(104,packMSG123(tlv));
                                 break;
                             }
 
@@ -243,47 +252,32 @@ public class parse {
 
         return header + ISOUtil.hexString(packbody);
     }
-    //55, 123ref
-    private String packMSG55(HashMap<String, Object> tlv) {
 
-        ISOMsg msg55=new ISOMsg(55);
+    private String packTLVFld(HashMap<String, Object> tlv){
+
         TLVList tlvData = new TLVList();
         for (Map.Entry<String, Object> obj : tlv.entrySet()){
-             Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
+            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
             tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
         }
-
-/*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
-*/
-
+        /*        tlvData.append(0x9F1A,ISOUtil.hex2byte("0978"));
+         */
         byte[] flfpack = tlvData.pack();
         String hex55=ISOUtil.hexString(flfpack);
         String hexSize=String.format("%04X", hex55.length()/2);
-        return "01"+hexSize+hex55;
+        return hexSize+hex55;
+    }
+    private String packMSG55(HashMap<String, Object> tlv) {
+
+        return "01"+packTLVFld(tlv);
     }
     private String packMSG123(HashMap<String, HashMap<String, Object>> tlv) {
         String message="";
 
         for (Map.Entry<String, HashMap<String, Object>> obj1 : tlv.entrySet()){
             HashMap<String, Object> item = obj1.getValue();
-
-       TLVList tlvData = new TLVList();
-        for (Map.Entry<String, Object> obj : item.entrySet()){
-            Integer tag= ISOUtil.byte2int(ISOUtil.hex2byte(obj.getKey()));
-            tlvData.append(tag,ISOUtil.hex2byte(obj.getValue().toString()));
+            message+=obj1.getKey()+packTLVFld(item);
         }
-
-            byte[] flfpack = tlvData.pack();
-            String hex123=ISOUtil.hexString(flfpack);
-            String hexSize=String.format("%04X", hex123.length()/2);
-            //return hexSize+hex123;
-
-            message+=obj1.getKey()+hexSize+hex123;
-
-        }
-
-
-        System.out.println(message);
     return message;
     }
 
@@ -454,7 +448,7 @@ public class parse {
         return data;
     }
 
-    public static HashMap<String, String> split(String tokenData){
+    public static HashMap<String, String> splitbyTag(String tokenData){
         boolean flag=true;
         Integer start=0;
         Integer counter=0;

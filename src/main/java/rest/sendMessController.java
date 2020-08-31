@@ -1,15 +1,10 @@
 package rest;
 
 
-import com.mycompany.iso8583.ConfigFile;
 import org.jpos.iso.ISOUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.*;
 
 @RestController
@@ -22,7 +17,6 @@ public class sendMessController {
     private static final int AUTH_FAILURE = 102;
 
     org.slf4j.Logger logger = LoggerFactory.getLogger(sendMessController.class);
-
 
     @GetMapping
     public Response showStatus(){
@@ -98,7 +92,7 @@ public class sendMessController {
             respMux= new Application().sendMess(c);
             logger.info(rawRequest);
         }
-        if(respMux.length>1){
+        if(respMux!=null&&respMux.length>1){
             HashMap<String, Object> list =new HashMap<String, Object>();
             Integer sizeHeader=new parse().headerDynamic(respMux);
             HashMap<String, Object> resp = new parse()
@@ -108,7 +102,9 @@ public class sendMessController {
 
             response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
         }else{
-            response = new Response(ERROR_STATUS, AUTH_FAILURE, null);
+            HashMap<String,Object> body=new HashMap<>();
+            body.put("send: ",rawRequest);
+            response = new Response(ERROR_STATUS, AUTH_FAILURE,body );
 
         }
         return response;

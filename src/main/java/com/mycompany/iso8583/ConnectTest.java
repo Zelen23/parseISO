@@ -62,13 +62,21 @@ public class ConnectTest implements Runnable {
                     byte[] buffer = new byte[1024];
                     oup.write(byteMess);
                     oup.flush();
+                    int counter=0;
 
                     while ((red = inp.read(buffer)) > -1) {
 
                         if (ISOUtil.hexString(buffer).lastIndexOf(
                             config.getParams("header.const"))==-1) {
                             logger.info("echo "+ISOUtil.hexString(buffer).substring(0,red));
+                            counter++;
+                            if (counter>=config.getIntParams("echo.counter")){
+                                logger.info("CMS no responsed ");
+
+                                break;
+                            }
                         } else {
+                            counter=0;
                             redData = new byte[red];
                             System.arraycopy(buffer, 0, redData, 0, red);
                             String respStr  = ISOUtil.hexString(redData);
@@ -90,6 +98,7 @@ public class ConnectTest implements Runnable {
                             }
 
                         }
+
                     }
 
                 }
