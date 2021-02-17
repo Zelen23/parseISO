@@ -82,7 +82,10 @@ public class ISOIss  extends ISOBasePackager{
   /*59*/    new IFB_LLHBINARY (255, "RESERVED NATIONAL"),
   /*add 60*/new IFB_LLHBINARY (12, "NATIONAL POINT-OF-SERVICE GEOGRAPHIC DATA"),
    /*add61*/new IFB_LLHBINARY (24, "ADDITIONAL POS INFORMATION"),
-            new IFB_LLHBINARY (36, "RESERVED NATIONAL"),
+            //new IFB_LLHBINARY (36, "RESERVED NATIONAL"),
+            new ISOMsgFieldPackager(
+                    new IFB_LLHBINARY (255, "Field 62"),
+                    new F62Packager()),
      /*63*/ new IFB_LLHBINARY (36, "RESERVED PRIVATE"),
             new IFB_BINARY  (  8, "MESSAGE AUTHENTICATION CODE FIELD"),
             new IFB_BINARY  (  1, "BITMAP, EXTENDED"),
@@ -187,6 +190,49 @@ public class ISOIss  extends ISOBasePackager{
         }
     }
 
+    protected static class F62Packager extends Base1SubFieldPackager
+    {
+        protected ISOFieldPackager fld62[] =
+                {
+                        new Base1_BITMAP126(16, "Bit Map"),
+                        new IFE_CHAR     (1, "Authorization Characteristics Indicator"),
+                        new IFB_NUMERIC  (15, "Transaction Identifier",true),
+                        new IFE_CHAR     (4, "Validation Code"),
+                        new IFE_CHAR     (1, "Market-Specific Data Identifier"),
+                        new IFB_NUMERIC  (2, "Duration",true),
+                        new IFE_CHAR     (1, "Prestigious Property Indicator"),
+                        new IFE_CHAR     (26, "Purchase Identifier"),
+                        new IFB_NUMERIC     (6, "Check-Out/Check-In Date",true),
+                        new IFE_CHAR     (1, "No Show Indicator"),
+                        new IFB_NUMERIC     (6, "Extra Charges",true),
+                        new IFB_NUMERIC     (2, "Multiple Clearing Sequence Number",true),
+                        new IFB_NUMERIC     (2, "Multiple Clearing Sequence Count",true),
+                        new IFB_NUMERIC     (1, "Restricted Ticket Indicator",true),
+                        new IFE_CHAR     (12, "Total Amount Authorized"),
+                        new IFE_CHAR     (1, "Requested Payment Service"),
+                        new IFE_CHAR     (2, "Chargeback Rights Indicator"),
+                        new IFE_CHAR     (15, "Gateway Transaction Identifier"),
+                        new IFE_CHAR     (4, "Validation Code"),
+                        new IFE_CHAR     (4, "Validation Code"),
+                        new IFB_NUMERIC     (10, "Merchant Verification Value",true),
+                        new IFE_CHAR     (4, "Online Risk Assessment Risk Score and Reason Codes"),
+                        new IFE_CHAR     (6, "Online Risk Assessment Condition Codes"),
+                        new IFE_CHAR     (2, "Product ID"),
+                        new IFE_CHAR     (6, "Program Identifier"),
+                        new IFE_CHAR     (1, "Spend Qualified Indicator"),
+                        new IFE_CHAR     (1, "Account Status"),
+                        new IFE_CHAR     (1, "Account Status"),
+                        new IFE_CHAR     (7, "ATM Routing Table Unique Identifier")
+
+
+                };
+
+        protected F62Packager ()
+        {
+            super();
+            setFieldPackager(fld62);
+        }
+    }
     protected static class F127Packager extends ISOBasePackager
     {
         protected ISOFieldPackager fld127[] =

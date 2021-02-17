@@ -6,7 +6,6 @@ import com.mycompany.iso8583.ConnectTest;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -17,14 +16,9 @@ import java.util.Properties;
 public class Application {
     static org.slf4j.Logger logger = LoggerFactory.getLogger(Application.class);
 
-
-    public static ConnectTest getConnect() {
-        return connect;
-    }
-
     public  static ConnectTest connect;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args)  {
 
        // SpringApplication.run(Application.class, args);
         SpringApplication application = new SpringApplication(Application.class);
@@ -48,8 +42,7 @@ public class Application {
          Socket conn=connect.getConnect();
          if(conn.isConnected()){
              logger.info("started");
-             byte[] resp = connect.checkecho(conn, mess);
-             return resp;
+             return connect.forMuxMess(conn, mess);
          }else{
              logger.info("disconnect");
              return null;

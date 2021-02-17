@@ -89,6 +89,7 @@ public class sendMessController {
 
             rawRequest= new parse().createMess(jsondata);
             byte[] c = ISOUtil.hex2byte(rawRequest);
+
             respMux= new Application().sendMess(c);
             logger.info(rawRequest);
         }
@@ -107,6 +108,45 @@ public class sendMessController {
             response = new Response(ERROR_STATUS, AUTH_FAILURE,body );
 
         }
+        return response;
+    }
+
+    @PostMapping("/createMess")
+    public Response createMess (@RequestParam(value = "mess") String mess,@RequestParam  (defaultValue = "raw") String mode,@RequestBody Request request){
+        final  Response response;
+
+        HashMap<String,Object> body=new HashMap<>();
+        HashMap<String,Object> jsondata=request.getData();
+        if(!jsondata.isEmpty()) {
+            String rawRequest;
+            byte []c;
+            rawRequest= new parse().createMess(jsondata);
+            c = ISOUtil.hex2byte(rawRequest);
+
+            if("detal".equals(mode)){
+                body.put("mess", new parse().parseToArray(ISOUtil.hexString(c).substring(52),true));
+            }else{
+                body.put("mess",rawRequest);
+            }
+
+        }
+
+        response = new Response(SUCCESS_STATUS, CODE_SUCCESS,body );
+        return response;
+    }
+
+    @PostMapping("/getCount")
+    public Response getCount (@RequestParam(value = "mess") String mess,@RequestBody Request request){
+        final  Response response;
+
+            byte []respMux = new byte[0];
+
+            respMux= new Application().sendMess(null);
+            HashMap<String, Object> list =new HashMap<String, Object>();
+
+            response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
+
+
         return response;
     }
 
