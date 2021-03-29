@@ -1,5 +1,6 @@
 package com.mycompany.iso8583;
 
+import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
 import org.jpos.iso.ISOUtil;
 import org.slf4j.Logger;
@@ -36,15 +37,18 @@ public class ConnectTest implements Runnable {
         try {
 
             connect = server.accept();
+            logger.info("conn ");
+            //getEco();
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-          }
+         }
 
     }
 
-    public byte[] checkecho(Socket conn, byte[] byteMess) {
+    public byte[] forMuxMess(Socket conn, byte[] byteMess) {
 
         byte[] redData = new byte[0];
 
@@ -56,7 +60,9 @@ public class ConnectTest implements Runnable {
                     connect.setSoTimeout(config.getIntParams("connect.timeout"));
 
                     OutputStream oup = conn.getOutputStream();
-                    InputStream inp=conn.getInputStream();
+                    InputStream inp= conn.getInputStream();
+
+                    inp.read();
 
                     int red = -1;
                     byte[] buffer = new byte[1024];
@@ -65,16 +71,20 @@ public class ConnectTest implements Runnable {
                     int counter=0;
 
                     while ((red = inp.read(buffer)) > -1) {
-
+// если в буффере  не нашел параметры заголовка то значит это эхо
                         if (ISOUtil.hexString(buffer).lastIndexOf(
                             config.getParams("header.const"))==-1) {
+
                             logger.info("echo "+ISOUtil.hexString(buffer).substring(0,red));
                             counter++;
-                            if (counter>=config.getIntParams("echo.counter")){
+                            logger.info("counter "+counter);
+                           /* if (counter>=config.getIntParams("echo.counter")){
                                 logger.info("CMS no responsed ");
+                                inp.reset();
+
 
                                 break;
-                            }
+                            }*/
                         } else {
                             counter=0;
                             redData = new byte[red];
@@ -114,7 +124,54 @@ public class ConnectTest implements Runnable {
 
         return null;
     }
+    public void getEco() throws IOException, ISOException {
 
+        InputStream inp = null;
+        try {
+            inp = connect.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        OutputStream oup = connect.getOutputStream();
+        int red = -1;
+        byte[] buffer = new byte[1024];
+        while ((red = inp.read(buffer)) > -1) {
+
+            String resiveMess=ISOUtil.hexString(buffer,0,red);
+            logger.info("resiveMess "+resiveMess);
+
+            if (resiveMess.equals("00000000")){
+                oup.write(ISOUtil.hex2byte("00000000"));
+
+
+            }else{
+                ISOMsg resp = new parse().parsers(resiveMess.substring(52));
+
+                if(resp.getMTI().equals("0800")){
+
+
+                    resp.setMTI("0810");
+                    byte[] packbody = resp.pack();
+                    int size = packbody.length + 22;
+                    String hexSize = String.format("%04X", size);
+
+                    String headConst = config.getParams("header.const");
+                    String header = hexSize + "0000160102" + hexSize + headConst + "0000000000000000000000";
+
+                    String r0810 = header + ISOUtil.hexString(packbody);
+                    logger.info("echo " + r0810);
+                    try {
+                        oup.write(ISOUtil.hex2byte(r0810));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+
+        }
+    }
     private String createMessID(ISOMsg isoMsg){
         return isoMsg.getString(7)+isoMsg.getString(11);
     }
