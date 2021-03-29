@@ -51,19 +51,14 @@ public class ConnectTest implements Runnable {
     public byte[] forMuxMess(Socket conn, byte[] byteMess) {
 
         byte[] redData = new byte[0];
-
         try {
-
             try {
-
                 if (!conn.isClosed()) {
                     connect.setSoTimeout(config.getIntParams("connect.timeout"));
 
                     OutputStream oup = conn.getOutputStream();
                     InputStream inp= conn.getInputStream();
-
                     inp.read();
-
                     int red = -1;
                     byte[] buffer = new byte[1024];
                     oup.write(byteMess);
