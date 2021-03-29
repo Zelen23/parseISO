@@ -1,10 +1,19 @@
 package rest;
 
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jpos.iso.ISOUtil;
+import org.jpos.security.MKDMethod;
+import org.jpos.security.SMException;
+import org.jpos.security.jceadapter.JCESecurityModule;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.Key;
 import java.util.*;
 
 @RestController
@@ -135,19 +144,6 @@ public class sendMessController {
         return response;
     }
 
-    @PostMapping("/getCount")
-    public Response getCount (@RequestParam(value = "mess") String mess,@RequestBody Request request){
-        final  Response response;
 
-            byte []respMux = new byte[0];
-
-            respMux= new Application().sendMess(null);
-            HashMap<String, Object> list =new HashMap<String, Object>();
-
-            response = new Response(SUCCESS_STATUS, CODE_SUCCESS, list);
-
-
-        return response;
-    }
 
 }

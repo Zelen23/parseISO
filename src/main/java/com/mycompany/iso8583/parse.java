@@ -122,6 +122,12 @@ public class parse {
                             list.put("de" + String.format("%03d", i), ISOUtil.hexString(comp.pack()));
                         }
                     }
+                    if(i==111){
+                        logger.info("Field 111 "+ISOUtil.hexString(msg.getBytes(i)));
+
+                        list.put("de" + String.format("%03d", i), msg.getString(i));
+
+                    }
                     if(i==104|i==123|i==56){
                         if(detalmode) {
                             list.put("de" + String.format("%03d", i),

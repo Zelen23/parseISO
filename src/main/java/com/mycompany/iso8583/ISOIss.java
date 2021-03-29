@@ -134,7 +134,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"), 
             new IFB_LLLCHAR (999, "RESERVED ISO USE"),
-    /*111*/ new IFB_LLHBINARY (255, "RESERVED ISO USE"),
+    /*111*/ new IFB_LLLHBINARY( 999, "RESERVED ISO USE"),
             new IFB_LLLCHAR (999, "RESERVED NATIONAL USE"),
             new IFB_LLLCHAR (999, "RESERVED NATIONAL USE"),
             new IFB_LLLCHAR (999, "RESERVED NATIONAL USE"   ),
