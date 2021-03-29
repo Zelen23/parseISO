@@ -271,7 +271,7 @@ public class parse {
                             //проверить строка или обьект
                             if(!obj.getValue().getClass().equals(String.class)){
                                 HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
-                                msg.set(123,packMSG123(tlv));
+                                msg.set(111,packMSG123(tlv));
                                 break;
                             }
                         case 123:

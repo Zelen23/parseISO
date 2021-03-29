@@ -34,8 +34,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cf206341-5997-4809-947c-5c1b88ce16ae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/iso8583/ConnectTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/iso8583/ConnectTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/iso8583/parse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/iso8583/parse.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
