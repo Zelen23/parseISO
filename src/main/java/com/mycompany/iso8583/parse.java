@@ -101,6 +101,33 @@ public class parse {
                         }
 
                     }
+                    if(i==62) {
+                        ISOComponent comp = msg.getComponent(62);
+                        ISOIss.F62Packager pp = new ISOIss.F62Packager();
+                        HashMap<String, String> f62 = new HashMap<>();
+
+
+                        if(detalmode) {
+                            ISOMsg subIso = new ISOMsg();
+                            subIso.setPackager(pp);
+                            subIso.unpack(comp.pack());
+                            for (int j = 1; j <= subIso.getMaxField(); j++) {
+
+                                if (subIso.hasField(j)) {
+                                    f62.put("" + j, subIso.getString(j));
+                                }
+                            }
+                            list.put("de" + String.format("%03d", i), f62);
+                        }else{
+                            list.put("de" + String.format("%03d", i), ISOUtil.hexString(comp.pack()));
+                        }
+                    }
+                    if(i==111){
+                        logger.info("Field 111 "+ISOUtil.hexString(msg.getBytes(i)));
+
+                        list.put("de" + String.format("%03d", i), msg.getString(i));
+
+                    }
                     if(i==104|i==123|i==56){
                         if(detalmode) {
                             list.put("de" + String.format("%03d", i),
@@ -197,6 +224,41 @@ public class parse {
                                 e.printStackTrace();
                             }
                             break;
+                        case 62:
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String, Object> subf2= (HashMap<String, Object>) obj.getValue();
+                                try {
+                                    msg.set(packMSG62(subf2));
+
+                                } catch (ISOException e) {
+                                    e.printStackTrace();
+                                }
+                            }else{
+                                ISOIss.F62Packager pp = new ISOIss.F62Packager();
+                                ISOMsg subIso = new ISOMsg();
+                                subIso.setPackager(pp);
+                                HashMap<String, Object> f62 = new HashMap<>();
+                                try {
+                                    subIso.unpack(ISOUtil.hex2byte(obj.getValue().toString()));
+                                    for (int j = 1; j <= subIso.getMaxField(); j++) {
+
+                                        if (subIso.hasField(j)) {
+                                            f62.put("" + j, subIso.getString(j));
+                                        }
+                                    }if(f62.size()!=0){
+                                        msg.set(packMSG62(f62));
+                                    }else{
+                                        logger.info("Field 62 can't parse this "+obj.getValue().toString());
+                                    }
+
+
+                                } catch (ISOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            break;
+
                         case 55:
                             //проверить строка или обьект
                             if(!obj.getValue().getClass().equals(String.class)){
@@ -294,9 +356,27 @@ public class parse {
                 e.printStackTrace();
             }
         }
-
-
+        System.out.println("msg126");
+        System.out.println(msg126);
+        System.out.println("**********");
         return msg126;
+    }
+
+    public ISOMsg packMSG62(Map<String, Object> obj) {
+
+        ISOMsg msg62 = new ISOMsg(62);
+        for (Map.Entry<String, Object> obj2 : obj.entrySet()) {
+            ISOField subfld = new ISOField(Integer.parseInt(obj2.getKey()), obj2.getValue().toString());
+            try {
+                msg62.set(subfld);
+
+            } catch (ISOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return msg62;
     }
     public Integer parseKey(String keyFromHashMap) {
 

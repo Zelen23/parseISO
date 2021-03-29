@@ -1,10 +1,19 @@
 package rest;
 
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jpos.iso.ISOUtil;
+import org.jpos.security.MKDMethod;
+import org.jpos.security.SMException;
+import org.jpos.security.jceadapter.JCESecurityModule;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import com.mycompany.iso8583.parse;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.Key;
 import java.util.*;
 
 @RestController
@@ -89,6 +98,7 @@ public class sendMessController {
 
             rawRequest= new parse().createMess(jsondata);
             byte[] c = ISOUtil.hex2byte(rawRequest);
+
             respMux= new Application().sendMess(c);
             logger.info(rawRequest);
         }
@@ -109,5 +119,31 @@ public class sendMessController {
         }
         return response;
     }
+
+    @PostMapping("/createMess")
+    public Response createMess (@RequestParam(value = "mess") String mess,@RequestParam  (defaultValue = "raw") String mode,@RequestBody Request request){
+        final  Response response;
+
+        HashMap<String,Object> body=new HashMap<>();
+        HashMap<String,Object> jsondata=request.getData();
+        if(!jsondata.isEmpty()) {
+            String rawRequest;
+            byte []c;
+            rawRequest= new parse().createMess(jsondata);
+            c = ISOUtil.hex2byte(rawRequest);
+
+            if("detal".equals(mode)){
+                body.put("mess", new parse().parseToArray(ISOUtil.hexString(c).substring(52),true));
+            }else{
+                body.put("mess",rawRequest);
+            }
+
+        }
+
+        response = new Response(SUCCESS_STATUS, CODE_SUCCESS,body );
+        return response;
+    }
+
+
 
 }
