@@ -54,7 +54,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFE_CHAR  ( 11, "AMOUNT, SETTLEMENT PROCESSING FEE"),
   /*de032*/ new IFB_LLHNUM   ( 11, "ACQUIRING INSTITUTION IDENT CODE",true),
             new IFE_CHAR   ( 11, "FORWARDING INSTITUTION IDENT CODE"),
-            new IFB_LLCHAR  ( 28, "PAN EXTENDED"),
+  /*de034*/ new IFB_LLHBINARY  ( 255, "ELECTRONIC COMMERCE DATA"),
    /*de035*/new IFB_LLHNUM (37, "TRACK 2 DATA",true),
             new IFB_NUMERIC (104, "TRACK 3 DATA",true),
             new IFE_CHAR     ( 12, "RETRIEVAL REFERENCE NUMBER"),
