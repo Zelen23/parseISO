@@ -148,7 +148,7 @@ public class ISOIss  extends ISOBasePackager{
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
     /*123*/ new IFB_LLHBINARY (255, "RESERVED PRIVATE USE"),
             new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
-            new IFB_LLLCHAR (999, "RESERVED PRIVATE USE"),
+    /*125*/        new IFB_LLHBINARY (255, "RESERVED PRIVATE USE"),
      /*126*///new IFB_LLHECHAR(99, "RESERVED PRIVATE USE"),//1b(hex)16b(bitmap)ebcid medd
             new ISOMsgFieldPackager(
                     new IFB_LLHBINARY (255, "Field 126"),

@@ -122,7 +122,7 @@ public class parse {
                             list.put("de" + String.format("%03d", i), ISOUtil.hexString(comp.pack()));
                         }
                     }
-                    if(i==104|i==123|i==56|i==111|i==34){
+                    if(i==104|i==123|i==56|i==111|i==34|i==125){
                         if(detalmode) {
                             list.put("de" + String.format("%03d", i),
                                     parsingObjectWithTLV(msg.getString(i)));
@@ -286,6 +286,13 @@ public class parse {
                             if(!obj.getValue().getClass().equals(String.class)){
                                 HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
                                 msg.set(123,packMSG123(tlv));
+                                break;
+                            }
+                        case 125:
+                            //проверить строка или обьект
+                            if(!obj.getValue().getClass().equals(String.class)){
+                                HashMap<String,HashMap<String, Object>> tlv= (HashMap<String, HashMap<String, Object>>) obj.getValue();
+                                msg.set(125,packMSG123(tlv));
                                 break;
                             }
                         case 104:
