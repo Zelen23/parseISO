@@ -181,6 +181,17 @@ public class ISOIss  extends ISOBasePackager{
                         new IFB_NUMERIC  (40, "Transaction ID", true),
                         new IFB_NUMERIC  (40, "TransStain", true),
                         new IFE_CHAR     (6,  "CVV2 Request Data"),
+                        new IFE_CHAR     (2,  "--"),
+                        new IFE_CHAR     (6,  "--"),
+                        new IFE_CHAR     (1,  "--"),
+                        new IFE_CHAR     (1,  "--"),
+                        new IFE_CHAR     (1,  "--"),
+                        new IFE_CHAR     (32,  "--"),
+                        new IFE_CHAR     (3,  "--"),
+                        new IFE_CHAR     (24,  "--"),
+                        new IFE_CHAR     (1,  "--"),
+                        new IFE_CHAR     (1,  "--"),
+
                 };
 
         protected F126Packager ()
