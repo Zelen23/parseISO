@@ -73,13 +73,13 @@ public class ConnectTest implements Runnable {
                             logger.info("echo "+ISOUtil.hexString(buffer).substring(0,red));
                             counter++;
                             logger.info("counter "+counter);
-                           /* if (counter>=config.getIntParams("echo.counter")){
+                            if (counter>=config.getIntParams("echo.counter")){
                                 logger.info("CMS no responsed ");
                                 inp.reset();
 
 
                                 break;
-                            }*/
+                            }
                         } else {
                             counter=0;
                             redData = new byte[red];
